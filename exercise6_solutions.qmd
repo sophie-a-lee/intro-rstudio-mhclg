@@ -1,0 +1,36 @@
+---
+title: "Exercise 6 solutions"
+format: html
+---
+
+
+```{r setup, include = FALSE}
+pacman::p_load(tidyverse, readxl)
+
+housing_market <- read_csv("saved_data/housing_market_tidy.csv") 
+
+labour_market <- read_csv("saved_data/labour_market_tidy.csv") 
+
+living_wage_long <- read_csv("saved_data/living_wage_long.csv")
+```
+
+### Question
+Combine all three OBR datasets (housing market, labour market and living wage) together to create one complete dataset, obr_data.
+
+### Solution
+Use `full_join` to combine the housing and labour market data by year and quarter, then pipe to apply `full_join` to the resulting data and add the living wage, joining by year. As there are multiple year rows in the housing and labour market data, include the argument `muliple = "all"` to ensure the living wage variable is repeated for each quarter.
+
+```{r join obr data}
+# full join the housing and labour market data
+obr_data <- full_join(housing_market, labour_market, 
+                      by = c("year", "quarter")) %>% 
+  # join this data to the living wage
+  full_join(., living_wage_long, by = "year", multiple = "all")
+```
+
+```{r save obr_data for future notes, echo = FALSE}
+write_csv(obr_data, file = "saved_data/obr_data.csv")
+```
+
+
+

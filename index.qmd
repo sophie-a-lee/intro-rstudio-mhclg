@@ -1,0 +1,13 @@
+# Welcome! {.unnumbered}
+
+Welcome to the Introduction to Quantitative Analysis with R course, designed for and with the Department for Levelling Up, Housing and Communities (DLUCH). This course aims to introduce R and RStudio software. R is an open-source software that was designed to make data analysis more accessible, reproducible, and user friendly. 
+
+This two-day course will equip you with the essential skills to leverage the power of R for your data analysis. We will begin with a gentle introduction to the RStudio interface and the basics of the R coding language (or syntax). We will then see how R can be used to efficiently load, clean and transform data. Finally, we will use R to produce clear, compelling visualisations and tables to communicate findings. 
+
+Throughout the course, we will discuss best practices for reproducible data analysis, ensuring that all code adheres to the [Analysis Standards](https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html) as recommended by the [Aqua book](https://www.gov.uk/government/publications/the-aqua-book-guidance-on-producing-quality-analysis-for-government).
+
+::: {.callout-tip}
+### Style tip
+
+Throughout the notes, you will see boxes with 'style tips'. These are to ensure that your code follows the [Tidyverse style guide](https://style.tidyverse.org/index.html), and ensuring your code adhered to [Analysis Standards](https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html).
+:::

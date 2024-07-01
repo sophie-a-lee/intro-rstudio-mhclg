@@ -1,0 +1,63 @@
+# R syntax
+
+All analyses within R is carried out using syntax, the R programming language. It is important to note that R is case-sensitive so always ensure that you use the correct combination of upper and lower case letters when running functions or calling objects.
+
+Any text written in the R console or script file can be treated the same as text from other documents or programmes: text can be highlighted, copied and pasted to make coding more efficient. 
+
+When creating script files, it is important to ensure they are clear and easy to read. Comments can be added to script files using the `#` symbol. R will ignore any text following the `#` on the same line. 
+
+::: {.callout-tip}
+### Style tip
+
+Combining `#` and `-` creates sections within a script file, making them easier to navigate and organise. 
+
+For example:
+
+```{r section style}
+# Load data ----------
+
+# Tidy data ----------
+```
+:::
+
+:::{.callout-note}
+### Helpful hint
+
+To comment out chunks of code, highlight the rows and use the keyboard shortcut *ctrl + shift + c* on Windows, and *Command + shift + c* on Mac
+:::
+
+The choice of brackets in R coding is particularly important as they all have different functions:
+
+- Round brackets `( )` are the most commonly used as they define arguments of functions. Any text followed by round brackets is assumed to be a function and R will attempt to run it. If the name of a function is not followed by round brackets, R will return the algorithm used to create the function within the console. 
+- Square brackets `[ ]` are used to set criteria or conditions within a function or object. 
+- Curly brackets `{ }` are used within loops, when creating a new function, and within `for` and `if` functions. 
+
+All standard notation for mathematical calculations (`+`, `-`, `*`, `/`, `^`, etc.) are compatible with R. At its simplest level, R is just a very powerful calculator!
+
+::: {.callout-tip}
+### Style tip
+
+Although R will work whether a space is added before/after a mathematical operator, the [style guide](https://style.tidyverse.org/syntax.html) recommends to add them surrounding most mathematical operations (`+`, `-`, `*`, `/`), but not around `^`. 
+
+For example:
+
+```{r space style, eval = FALSE}
+# Stylish code
+1959 - 683
+(351 + 457)^2 - (213 + 169)^2
+
+# Un-stylish code
+1959-683
+(351+457)^2 - (213 + 169) ^ 2
+```
+:::
+
+
+## Exercise 2
+
+1.	Add your name and the date to the top of your script file (hint: comment this out so R does not try to run it)
+2.	Use R to answer to following and write the answers within the script file:
+  a. $64^2$
+  b. $3432 \div 8$
+  c. $96 \times 72$
+ 

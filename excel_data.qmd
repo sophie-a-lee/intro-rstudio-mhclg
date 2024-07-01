@@ -1,0 +1,171 @@
+# Loading and tidying Excel data
+
+In the first part of the course, we saw how SPSS data (`.sav`) can be loaded into R using the `haven` package. Another common format of data that cannot be loaded into base R is excel (`.xlsx`). The package required to read Excel data is the `readxl` package. 
+
+If this is the first time using the `readxl` package, remember to install this to your machine using the `install.packages` function:
+
+```{r install readxl, eval = FALSE}
+install.packages("readxl")
+```
+
+Once this package has been installed, add it to the list of packages to install at the top of your script file:
+
+```{r load packages, message = FALSE, warning = FALSE}
+pacman::p_load(tidyverse, haven, readxl)
+```
+
+## Loading an Excel sheet into R
+As with any file format, we must ensure data are in the correct form before loading them into R, ensuring each column represents a variable, each row represents an observation, and there are no tables or graphics. 
+
+Excel files can be a little tricker to manipulate than SPSS and CSV files as they often contain multiple sheets. This is the case for the data that we will be using for this part of the course.
+
+The Excel file that we will be loading contains the [Office for Budget Responsibility (OBR) economic and fiscal outlook](https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fobr.uk%2Fdocs%2Fdlm_uploads%2FDetailed_forecast_tables_Economy_March_2024.xlsx&wdOrigin=BROWSELINK). This contains many sheets of data, but for this course we will just be focusing on three:
+
+- 1.6 Labour market
+- 1.14 National living wage
+- 1.17 Housing market
+
+Let's begin with housing market data, stored in the 18th sheet, labelled "1.17". This sheet can be selected in the `read_xlsx` function using the `sheet` argument. 
+
+The housing market sheet shows information over different time scales: first by quarters, then years, and then across pairs of years. For this example, we will extract information measured quarterly (rows 4 - 88). The argument `range` allows us to define the range of cells (by columns and rows) to extract.
+
+Finally, we can see that the column headers are not in an appropriate format for R: they contain spaces, brackets, and are very long! There are two approaches we will consider to overcome this. 
+
+The first is to remove the column names completely (by not including them in the `range` argument and setting `col_names = FALSE` within the `read_xlsx` function) and add them manually, using the `setNames` function.
+
+Setting names manually can take a long time and a lot of typing if there are many variables. An alternative to this manual approach is to include them in the `range` of the `read_xlsx` function, and use an R function to 'clean' them, making them follow the [style guide](https://style.tidyverse.org/index.html).
+
+:::{.callout-tip}
+# Style tip
+
+The `janitor` package has been designed to format inputed data to ensure it follows the Tidyverse style guide. The `clean_names` function can be applied to a data frame or tibble to adapt variable names in this way.
+:::
+
+The following code loads the housing market sheet and manually sets the variable names:
+
+```{r load housing market set names, message = FALSE}
+# Return file names from the data folder
+list.files(path = "data")
+
+housing_market <- 
+  read_xlsx("data/Detailed_forecast_tables_Economy_March_2024.xlsx",
+                            # Specify the sheet and range of cells to keep
+                            sheet = "1.17",range = "B4:J88", 
+                            # Remove column names (too messy)
+                            col_names = FALSE) %>% 
+  # Add variable names manually
+  setNames(c("period", "hpi_comp15", "hpi_prev_year", 
+             "residential_property_transactions", 
+             "private_enterprise_housing_starts",
+             "private_enterprise_housing_comp", 
+             "housing_stock", "net_additions_housing_stock",
+             "turnover_rate"))
+```
+
+The following code loads the same data but uses the `janitor` package. 
+
+:::{.callout-warning}
+Do not run this code without installing and loading the `janitor` package first. We will not run this during the course, but it is included for future reference.
+:::
+
+```{r housing market using janitor, eval = FALSE}
+housing_market_alt <-
+  read_xlsx("data/Detailed_forecast_tables_Economy_March_2024.xlsx",
+                                # Specify the sheet and range of cells to keep
+                                sheet = "1.17",range = "B3:J88") %>% 
+  # Removes spaces, special characters, all lower case, etc.
+  clean_names()
+```
+
+## Splitting variables 
+In the current dataset, the time variable is given as a character and so is not recognised as ordered or temporal by R. To overcome this, we can split the variable to create separate year and quarter variables. 
+
+The `str_sub` function from tidyverse's `stringr` package extracts elements based on their position in a string of characters. This can be used to return the first 4 digits to a new `year` variable, and the final digit to a new `quarter` variable:
+
+```{r split date variable}
+housing_market <- housing_market %>%
+  # Don't forget to convert the string to numberic
+  mutate(year =  as.numeric(str_sub(period, start = 1, end = 4)),
+         quarter = as.numeric(str_sub(period, 
+                              # Use - to work from the end of the string
+                              start = -1L, end = -1L))) %>% 
+  # Remove the original period variable
+  select(-period)
+```
+
+## Exercise 5
+1. Load in the OBR's quarterly labour market data (sheet 1.6), keeping the following variables:
+
+- Period 
+- Employment rate (%)
+- Average earning growth (%)
+- Average earning index
+- Productivity per hour index
+- Real wage product 
+- Real consumption wage
+
+Split the period data into separate year and quarter variables, ensure that all variable names follow Tidyverse's style guide. Name this object `labour_market`. 
+
+2. Load the OBR's national living wage data (sheet 1.14), keep as an object named `living_wage`. 
+
+
+```{r load labour market and living wage data, echo = FALSE, message = FALSE}
+labour_market <- 
+  read_xlsx("data/Detailed_forecast_tables_Economy_March_2024.xlsx",
+            # Specify the sheet and range of cells to keep
+            sheet = "1.6",range = c("B4:V88"), 
+            # Remove column names (too messy)
+            col_names = FALSE) %>% 
+  select(1, 3, 15, 16, 18, 20, 21) %>% 
+  # Add variable names manually
+  setNames(c("period", "employment_rate", "earning_growth", "earning_index", 
+             "productivity_hour", "real_product_wage",
+             "real_consumption_wage")) %>% 
+  mutate(year = as.numeric(str_sub(period, start = 1L, end = 4L)),
+         quarter = as.numeric(str_sub(period, start = -1L, end = -1L))) %>% 
+  select(-period)
+
+living_wage <- 
+  read_xlsx("data/Detailed_forecast_tables_Economy_March_2024.xlsx",
+            # Specify the sheet and range of cells to keep
+            sheet = "1.14", range = c("C4:K5")) %>% 
+  rename_with(~paste0("year_", .x))
+
+# Save the tidied versions of these data
+write_csv(housing_market, file = "saved_data/housing_market_tidy.csv")
+
+write_csv(labour_market, file = "saved_data/labour_market_tidy.csv")
+
+write_csv(living_wage, file = "saved_data/living_wage_tidy.csv")
+```
+
+
+## Tranforming data
+The labour market and housing market data are currently considered in what is known as **long format**, with many rows and fewer variables. The alternative to this format, **wide format**, can be seen in the living wage data, which has many variables and very few (only one!) row. Sometimes we may wish to convert between these variables, either to join them to other datasets (as is the case here), or to carry out an analysis or visualisation that requires a certain format. These conversions are carried out using the `pivot_longer` or `pivot_wider` functions. 
+
+There are many ways to pivot data within R (see the helpfile `?pivot_longer` for a full list of arguments), and the setup of this function tends to differ for every situation. For worked examples and a more detailed explanation of the function's capabilities, enter `vignette("pivot")` into the console. For our data, we will need to convert the wide-format living wage data to a long-format so we are able to join it to the other data. This will create a new dataset with 2 variables: year and living wage, with a row per year. The `year` variable will be taken from the wide data names, and the `living_wage` variable will come from the wide data values:
+
+```{r pivot living wage}
+living_wage_long <- living_wage %>% 
+  # First, select the columns that we wish to pivot (all of them)
+  pivot_longer(cols = everything(),
+               # Move the old variable names to a new year variable
+               names_to = "year",
+               # Remove the prefix from the old variable names
+               names_prefix = "year_",
+               # Convert the new year variable to numeric
+               names_transform = as.numeric,
+               # Take the old values and create a new living_wage variable
+               values_to = "living_wage")
+```
+
+```{r save living wage long, echo = FALSE}
+write_csv(living_wage_long, file = "saved_data/living_wage_long.csv")
+```
+
+
+## Exercise 6
+1. Combine all three OBR datasets (housing market, labour market and living wage) together to create one complete dataset, `obr_data`.
+
+
+

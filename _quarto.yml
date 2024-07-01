@@ -1,0 +1,25 @@
+project:
+  type: book
+
+book:
+  title: "Introduction to quantitative analysis with R"
+  author: "Dr Sophie Lee"
+  date: "19/16/2024"
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - syntax.qmd
+    - objects_functions.qmd
+    - open_explore_data.qmd
+    - combining_summarising.qmd
+    - excel_data.qmd
+    - visualisation.qmd
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+
+

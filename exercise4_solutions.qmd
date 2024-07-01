@@ -1,0 +1,89 @@
+---
+title: "Exercise 4 solutions"
+format: html
+---
+
+```{r setup, include = FALSE}
+pacman::p_load(tidyverse, haven)
+
+ehs_tidy <- read_csv("saved_data/ehs_tidy.csv") %>% 
+  mutate(across(where(is.character), factor))
+
+```
+
+### Question 1
+How many responders had both weekly rent and mortgage payments given? What are the potential reasons for this?
+
+### Solution
+We can combine the `filter` and `count` functions to answer the first part of this question:
+
+```{r responders with both rent and mortgage}
+ehs_tidy %>% 
+  filter(!is.na(weekly_rent), !is.na(weekly_mortgage)) %>% 
+  count()
+```
+
+There were 105 responders with both weekly rent and mortgage payments. 
+
+To understand why this is, we could first view this data (or a summary of the data) to see what other characteristics these responders share:
+
+```{r view rent and mortgage payees}
+ehs_tidy %>% 
+  filter(!is.na(weekly_rent), !is.na(weekly_mortgage)) %>% 
+  summary()
+```
+
+All responders in this group owned and lived in their own home. Most were leasehold properties, suggesting some of the weekly rent refers to lease payments. Other potential reasons could include shared ownership (which is not given as an option for tenure type), or responders that lived with renters in the same property.
+
+### Question 2
+Combine the weekly rent and mortgage variables into a single weekly payment variable.
+
+### Solution
+Where only one value has been recorded, we want to use this in the new variable. Where both have been recorded, we will need to add the values together to get a weekly total. 
+
+There are a few different ways to do this. The first is to include an `if_else` statement in the `mutate` function, changing how the variable is calculated whether either value is missing or not:
+
+```{r weekly total if_else}
+ehs_tidy_ex4 <- ehs_tidy %>% 
+  # if either weekly_rent or weekly_mortgage are missing
+  mutate(weekly_total = if_else(is.na(weekly_rent) | is.na(weekly_mortgage), 
+                                # return the non-missing value
+                                coalesce(weekly_rent, weekly_mortgage), 
+                                # if neither are missing, add the variables together
+                                weekly_rent + weekly_mortgage))
+```
+
+An alternative would be to use `rowwise` which groups data by rows and carries out operations across rows rather than columns. This can be combined with the `sum` function which contains the optional `na.rm` argument to remove missing values:
+
+```{r weekly total rowwise, eval = FALSE}
+ehs_tidy_ex4 <- ehs_tidy %>% 
+  # group data by rows
+  rowwise() %>% 
+  # add totals by using the sum function which has the argument na.rm to remove missing data
+  mutate(weekly_total = sum(weekly_rent, weekly_mortgage, na.rm = TRUE))
+```
+
+One issue here is that the `rowwise` option replaces missing values with zeros. Some of the properties missing both rent and mortgage values may be a result of an incomplete survey.
+
+To avoid this, we will use the first example (`if_else`) to create the newest variable.
+
+### Question 3
+Create a summary table containing the mean, median, standard deviation, and the upper and lower quartiles of the weekly payment (rent and mortgage combined) for each region. What, if anything, can you infer about the distribution of this variable based on the table?
+
+### Solution
+```{r summarise total payments}
+ehs_tidy_ex4 %>% 
+  group_by(region) %>% 
+  summarise(mean_payment = mean(weekly_total, na.rm = TRUE),
+            median_payment = median(weekly_total, na.rm = TRUE),
+            sd_payment = sd(weekly_total, na.rm = TRUE),
+            lq_payment = quantile(weekly_total, .25, na.rm = TRUE),
+            uq_payment = quantile(weekly_total, .75, na.rm = TRUE)) %>% 
+  ungroup()
+```
+
+There are big differences between most mean and medians across regions, indicating that the data are not normally distributed. If we use the approximate 95% range formula (mean $\pm$ 2 $\times$ sd), we would get negative values for all regions. Negative payments do not make sense in this context, confirming that the data are not normally distributed. 
+
+In this case, the median and IQR should be give, not the mean and standard deviation.
+
+

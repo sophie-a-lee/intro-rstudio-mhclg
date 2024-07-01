@@ -1,0 +1,114 @@
+---
+title: "Exercise 3 solutions"
+format: html
+---
+
+```{r setup, include = FALSE}
+pacman::p_load(tidyverse, haven)
+```
+
+### Question 1
+You have been provided with another .sav file which contains the interview responses from the EHS. Create and save a tidy version of this dataset, ensuring variables are classified as the correct type and names follow the style conventions (if you cannot remember these, check [here](https://style.tidyverse.org/syntax.html) for a reminder.
+
+The variables we need in the tidy dataset are:
+
+- The unique identifier `serialanon`
+- The gross household income `HYEARGRx`
+- The length of residence `lenresb`
+- The weekly rent `rentwkx` and mortgage `mortwkx` payments
+- Whether the property is freehold or leasehold `freeLeas`
+
+
+### Solution
+The first step is to load in the data. However, before this, we need the name of the file. We can look into our documents to get this, but the `list.files` function will do it for us:
+
+```{r list.files to get file name}
+list.files(path = "data")
+```
+
+From the console, we can copy and paste the file name into the `read_spss` function:
+
+```{r load SPSS file, eval = FALSE}
+ehs_interview_tidy <- read_spss("data/interviewfs21_EUL.sav")
+```
+
+Next, we can `select` just the variables we need to reduce the data size:
+
+```{r select ehs_interview variables}
+ehs_interview_tidy <- read_spss("data/interviewfs21_EUL.sav") %>% 
+  select(serialanon, HYEARGRx, lenresb, rentwkx, mortwkx, freeLeas)
+```
+
+We can now explore this data to see which variables need converting, and which are truly numeric:
+
+```{r str interview data}
+str(ehs_interview_tidy)
+```
+
+As with the general data, all variables are classified as `dbl + lbl` by R. Of these, the length of residence and freehold/leashold variables appear to by categorical. There are also labels attached to the gross annual income (for those over £100,000) which we need to be aware of when analysing this data.
+
+Therefore, our next step will involve converting the categorical variables into factors:
+
+```{r ehs interview factors}
+ehs_interview_tidy <- read_spss("data/interviewfs21_EUL.sav") %>% 
+  select(serialanon, HYEARGRx, lenresb, rentwkx, mortwkx, freeLeas) %>% 
+  mutate(length_residence = as_factor(lenresb),
+         freehold_leasehold = as_factor(freeLeas))
+
+head(ehs_interview_tidy)
+```
+
+Finally, we need to rename the existing variables to ensure they are informative and follow the style rules, and remove any unnecessary variables:
+
+```{r finish tidying EHS interview}
+ehs_interview_tidy <- read_spss("data/interviewfs21_EUL.sav") %>% 
+  select(serialanon, HYEARGRx, lenresb, rentwkx, mortwkx, freeLeas) %>% 
+  mutate(length_residence = as_factor(lenresb),
+         freehold_leasehold = as_factor(freeLeas)) %>% 
+  rename(id = serialanon,
+         gross_income = HYEARGRx,
+         weekly_rent = rentwkx,
+         weekly_mortgage = mortwkx) %>% 
+  select(id, gross_income, length_residence, weekly_rent, weekly_mortgage, 
+         freehold_leasehold)
+```
+
+## Question 2
+Save the tidy interview dataset as a csv file with an appropriate file name.
+
+## Solution
+```{r save tidy interview data as a csv file}
+write_csv(ehs_interview_tidy, file = "saved_data/ehs_interview_tidy.csv")
+```
+
+## Question 3
+Using the new, tidy dataset, answer the following questions:
+
+- How many respondents paid weekly rent of between £150 and £300?
+- How many respondents did not give a response to either the weekly rent or weekly mortgage question?
+- What is the highest household gross income of these responders? 
+
+## Solution
+For the first two part, we use the `filter` function to return a subgroup matching the condition, and combine this with the `count` function that counts the number of rows in a tibble:
+
+```{r count rows}
+ehs_interview_tidy %>% 
+  filter(between(weekly_rent, 150, 300)) %>% 
+  count()
+
+ehs_interview_tidy %>% 
+  filter(is.na(weekly_rent), is.na(weekly_mortgage)) %>% 
+  count()
+```
+
+There were 993 respondents that paid weekly rent of between £150 and £300.
+
+There were 2956 respondents that did not give a response to either the weekly rent or mortgage question.
+
+The final part could usually be carried out with the base R `max` function:
+
+```{r max income}
+max(ehs_interview_tidy$gross_income)
+```
+
+However, the labels attached to the SPSS file showed that a value of 100000 actually represents a group. Therefore, we cannot answer this question from the available data. We must also be careful when analysing this variable as failure to remove account for this will skew the data (assuming that anyone earning over £100,000 actually earns exactly £100,000).
