@@ -4,7 +4,6 @@ project:
 book:
   title: "Introduction to quantitative analysis with R"
   author: "Dr Sophie Lee"
-  date: "19/16/2024"
   chapters:
     - index.qmd
     - intro.qmd
