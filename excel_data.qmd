@@ -93,7 +93,7 @@ housing_market <- housing_market %>%
   select(-period)
 ```
 
-## Exercise 5
+## Exercise 5 {.unnumbered}
 1. Load in the OBR's quarterly labour market data (sheet 1.6), keeping the following variables:
 
 - Period 
@@ -108,6 +108,16 @@ Split the period data into separate year and quarter variables, ensure that all 
 
 2. Load the OBR's national living wage data (sheet 1.14), keep as an object named `living_wage`. 
 
+:::{.callout-tip}
+### Hint
+
+The function `paste0` is a base R function that combines arguments separated by commas into a single string without spaces. For example, 
+
+```{r paste0 hint}
+paste0("abc", 1, 10, "_2010")
+```
+
+:::
 
 ```{r load labour market and living wage data, echo = FALSE, message = FALSE}
 labour_market <- 
@@ -140,10 +150,12 @@ write_csv(living_wage, file = "saved_data/living_wage_tidy.csv")
 ```
 
 
-## Tranforming data
+## Transforming data
 The labour market and housing market data are currently considered in what is known as **long format**, with many rows and fewer variables. The alternative to this format, **wide format**, can be seen in the living wage data, which has many variables and very few (only one!) row. Sometimes we may wish to convert between these variables, either to join them to other datasets (as is the case here), or to carry out an analysis or visualisation that requires a certain format. These conversions are carried out using the `pivot_longer` or `pivot_wider` functions. 
 
-There are many ways to pivot data within R (see the helpfile `?pivot_longer` for a full list of arguments), and the setup of this function tends to differ for every situation. For worked examples and a more detailed explanation of the function's capabilities, enter `vignette("pivot")` into the console. For our data, we will need to convert the wide-format living wage data to a long-format so we are able to join it to the other data. This will create a new dataset with 2 variables: year and living wage, with a row per year. The `year` variable will be taken from the wide data names, and the `living_wage` variable will come from the wide data values:
+There are many ways to pivot data within R (see the helpfile `?pivot_longer` for a full list of arguments), and the setup of this function tends to differ for every situation. For worked examples and a more detailed explanation of the function's capabilities, enter `vignette("pivot")` into the console. 
+
+For our data, we will need to convert the wide-format living wage data to a long-format so we are able to join it to the other data. This will create a new dataset with 2 variables: `year` and `living_wage`, with a row per year. The `year` variable will be taken from the wide data names, and the `living_wage` variable will come from the wide data values:
 
 ```{r pivot living wage}
 living_wage_long <- living_wage %>% 
@@ -164,7 +176,7 @@ write_csv(living_wage_long, file = "saved_data/living_wage_long.csv")
 ```
 
 
-## Exercise 6
+## Exercise 6 {.unnumbered}
 1. Combine all three OBR datasets (housing market, labour market and living wage) together to create one complete dataset, `obr_data`.
 
 

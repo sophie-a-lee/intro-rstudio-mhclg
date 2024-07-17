@@ -59,7 +59,7 @@ Have a clear order to your analysis folder. Consider creating separate folders w
 :::
 
 ## Loading data
-To ensure our code is collaborative and reproducible, we should strive to store data in formats that can be used across multiple platforms. One of the best ways to do this is to store data as a comma-delimited file (.csv). CSV files can be opened by a range of different softwares (including R, SPSS, STATA and excel), and base R can be used to open these files without requiring additional packages. 
+To ensure our code is collaborative and reproducible, we should strive to store data in formats that can be used across multiple platforms. One of the best ways to do this is to store data as a comma-separated file (.csv). CSV files can be opened by a range of different softwares (including R, SPSS, STATA and excel), and base R can be used to open these files without requiring additional packages. 
 
 Unfortunately, we are not always able to choose the format that data are stored in. For example, the English Housing Survey (EHS) data is stored as a .sav (SPSS) data file. Fortunately for us, R has a wide range of packages that have been developed to load data from every conceivable format. 
 
@@ -80,7 +80,7 @@ The first data set we will load is the`generalfs21_EUL.sav` file. This contains 
 The EHS data can be loaded into R using the `read_spss` function, and saved as an object using the `<-` symbol:
 
 ```{r load ehs general}
-ehs_general <- read_spss(file = "Data/generalfs21_EUL.sav")
+ehs_general <- read_spss(file = "data/generalfs21_EUL.sav")
 ```
 
 The imported data will appear in the environment with its given name. The contents of the object can be viewed by clicking on the object name in the environment, opening a tab next to script files. This window is a preview so cannot be edited here.
@@ -140,28 +140,42 @@ The `select` function can also be used to remove variables from a tibble by addi
 select(ehs_general, -serialanon)
 ```
 
-After making changes to the analysis dataset, it is useful to save this data separately to the original raw data. This can be done using the `write_csv` function.
+After making changes to the analysis dataset, it is useful to save this data separately to the original raw data. This can be done using the `write_csv` function. 
 
 ```{r save ehs updated data}
 ehs_general_reduced <- select(ehs_general, serialanon, aagfh21, tenure4x, gorehs)
 ```
 
 ```{r write_csv, eval = FALSE}
-write_csv(ehs_general_reduced, file = "ehs_general_reduced.csv")
+write_csv(ehs_general_reduced, file = "saved_data/ehs_general_reduced.csv")
 ```
 
 :::{.callout-warning}
 When saving updated tibbles as files, use a different file name to the original raw data. Using the same name will overwrite the original file. We always want a copy of the original in case of any errors or issues.
 :::
 
-The `select` function returns variables as a tibble object. However, some functions, for example summary functions from base R, require data in the form of a `vector`. Vectors are lists of numbers with no formal structure, unlike a tibble which is structured to have rows and columns. To return a single variable as a vector, we can use the `$` symbol between the data name and the variable to return:
+The `select` function returns variables as a tibble object. However, some functions, for example summary functions from base R, require data in the form of a `vector`. Vectors are lists of values with no formal structure, unlike a tibble which is structured to have rows and columns. To return a single variable as a vector, we can use the `$` symbol between the data name and the variable to return:
 
 ```{r ehs_general vector, eval = FALSE}
 ehs_general_reduced$aagfh21
 ```
 
 ## Filtering data
-The `filter` function, from tidyverse's `dplyr` package allows us to return subgroups of the data based on conditional statements. These conditional statements can include mathematical operators, e.g.  `<=` (less than or equal to), `==` (is equal to), and `!=` (is not equal to), or can be based on conditional functions, e.g. `is.na(variable)` (is missing), `between(a, b)` (number lies between a and b). A list of these conditional statements can be found in the help file using `?filter`.
+The `filter` function, from tidyverse's `dplyr` package allows us to return subgroups of the data based on conditional statements. These conditional statements can include mathematical operators:
+
+- `<=` less than or equal to, 
+- `<` less than,
+- `>=` greater than or equal to,
+- `>` greater than,
+- `==` is equal to, 
+- `!=` is not equal to, 
+
+or can be based on conditional functions:
+
+- `is.na(variable)` where variable is missing, #
+- `between(variable, a, b)` where variable lies between a and b.
+
+A list of these conditional statements can be found in the help file using `?filter`.
 
 For example, we may wish to return rows from the EHS dataset that were privately rented. To check which number refers to privately rented, we can check the `labels` attribute of the `tenure4x` variable which shows the labels from the SPSS file:
 
@@ -175,7 +189,7 @@ Private rented is given by a 2 in the current dataset, therefore our conditional
 filter(ehs_general_reduced, tenure4x == 2)
 ```
 
-Multiple conditional statements can be added to the same function by separating them with a comma `,`. To return all respondents that lived in privately rented accommodation in the North East, we can extend the previous filter statement:
+Multiple conditional statements can be added to the same function by separating them with a comma `,` where we want all conditions met, or the `|` in place of or. To return all respondents that lived in privately rented accommodation in the North East, we can extend the previous filter statement:
 
 ```{r filter privately rented in NE}
 attributes(ehs_general_reduced$gorehs)$labels
@@ -265,8 +279,7 @@ Our EHS analysis dataset has been created haphazardly through this chapter to de
 
 The code below takes the data from its saw form (the .sav file) and transforms it into a clean dataset that we will be using for the rest of the course:
 
-```{r ehs_general tidy}
-#| code-fold: true
+```{r ehs_general tidy, results = "hide"}
 # Step 1: load the dataset into R and attach as an object
 ehs_general_tidy <- read_spss(file = "Data/generalfs21_EUL.sav") %>% 
 # Step 2: convert grouping variables into factors
@@ -286,8 +299,8 @@ write_csv(ehs_general_tidy, file = "saved_data/ehs_general_tidy.csv")
 ```
 
 
-## Exercise 3
-1. You have been provided with another .sav file which contains the interview responses from the EHS. Create and save a tidy version of this dataset, ensuring variables are classified as the correct type and names follow the style conventions (if you cannot remember these, check [here](https://style.tidyverse.org/syntax.html) for a reminder.
+## Exercise 3 {.unnumbered}
+1. You have been provided with another .sav file which contains the interview responses from the EHS. Create and save a tidy version of this dataset, ensuring variables are classified as the correct type and names follow the style conventions (if you cannot remember these, check [here](https://style.tidyverse.org/syntax.html) for a reminder).
 
 The variables we need in the tidy dataset are:
 

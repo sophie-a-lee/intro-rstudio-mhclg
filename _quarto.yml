@@ -3,21 +3,42 @@ project:
 
 book:
   title: "Introduction to quantitative analysis with R"
-  author: "Dr Sophie Lee"
-  date: 24/07/2024 
+  author: "Sophie Lee"
+  date: 2024/07/24
+  search: true
+  sidebar:
+    collapse-level: 1
+  repo-url: https://github.com/sophie-a-lee/introduction_rstudio_dluch
+  repo-actions: [edit]
+  downloads: [pdf]
+  sharing: [twitter]
   chapters:
     - index.qmd
-    - intro.qmd
-    - syntax.qmd
-    - objects_functions.qmd
-    - open_explore_data.qmd
-    - combining_summarising.qmd
-    - excel_data.qmd
-    - visualisation.qmd
+    - part: "Introduction to R and RStudio"
+      chapters:
+        - intro.qmd
+        - syntax.qmd
+        - objects_functions.qmd
+    - part: "Tidyverse and data wrangling"
+      chapters: 
+        - open_explore_data.qmd
+        - combining_summarising.qmd
+        - excel_data.qmd
+    - part: "Data visualisation"
+      chapters: 
+        - visualisation.qmd
+  appendices: 
+    - exercise3_solutions.qmd
+    - exercise4_solutions.qmd
+    - exercise5_solutions.qmd
+    - exercise6_solutions.qmd
+    - exercise7_solutions.qmd
+    - exercise8_solutions.qmd
+    
 
 format:
   html:
-    theme: cosmo
+    theme: pulse
   pdf:
     documentclass: scrreprt
 

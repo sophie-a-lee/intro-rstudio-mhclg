@@ -21,7 +21,7 @@ Data visualisation is a powerful tool with many important uses. First, visualisa
 
 ## Choosing the most appropriate visualisation
 
-The most appropriate choice of visualisation will depend on the type of variable(s) we wish to display, the number of variables and the message we are trying to disseminate. Common plots used to display combinations of different types of data are given in following table: 
+The most appropriate choice of visualisation depends first and foremost on the **goal**, the **context**, and the **audience** of the visualisation. This choice will also be influenced (or restricted) by the type of variable(s) we wish to display and the number of variables. Common plots used to display combinations of different types of data are given in following table: 
 
 
 ```{r Visualisation table, echo = FALSE}
@@ -61,7 +61,9 @@ flextable(vis_tab) %>%
   bg(part = "body", bg = "gray95")
 ```
 
-R is very flexible when it comes to visualising data and contains a wide variety of options to customise graphs. This section will focus on the Tidyverse package `ggplot2` and introduce some of the more commonly used graphical functions and parameters. 
+For a more comprehensive list (including some non-standard graphs), visit the [From data to viz website](https://www.data-to-viz.com/).
+
+R is very flexible when it comes to visualising data and contains a wide variety of options to customise graphs. This section will focus on the tidyverse package `ggplot2` and introduce some of the more commonly used graphical functions and parameters. 
 
 ## The ggplot2 package
 The `ggplot2` package implements the ‘grammar of graphics’, a system that aims to describe all statistical graphics in terms of their components or layers. All graphics can be broken down into the same components: the data, a coordinate system (or plot area) and some visual markings of the data. More complex plots may have additional layers but all must contain these three. 
@@ -74,7 +76,7 @@ For any visualisation created using `ggplot2`, we first  use the `ggplot` functi
 ggplot(data = ehs_tidy)
 ```
 
-To add information to this graph, we add a **geom** layer: a visual representation of the data. There are many different geom objects built into the ggplot2 package (begin typing `?geom` into the console to see a list). The `geom_bar` function is used to create bar charts
+To add information to this graph, we add a **geom** layer: a visual representation of the data. There are many different geom objects built into the ggplot2 package (begin typing `?geom` into the console to see a list). The `geom_bar` function is used to create bar charts.
 
 Each geom object must contain a mapping argument, coupled with the `aes` function which defines how the variables in the dataset are visualised. In this case, we use the `aes` function to specify the grouping variable on the x axis, but it can also be used to set the colour, size or symbol based on variable values. 
 
@@ -87,7 +89,7 @@ ggplot(data = ehs_tidy) +
   geom_bar(mapping = aes(x = tenure_type))
 ```
 
-Graphs appear in the plot window in RStudio and can be opened in a new window using the ![zoom icon](img/zoom_shortcut.png) icon. Graphs in this window can also be copied and pasted into other documents using the ![export icon](img/export_shortcut.png) icon and selecting *Copy to clipboard*. 
+Graphs appear in the plot tab in the bottom-right of the RStudio interface and can be opened in a new window using the ![zoom icon](img/zoom_shortcut.png) icon. Graphs in this window can also be copied and pasted into other documents using the ![export icon](img/export_shortcut.png) icon and selecting *Copy to clipboard*. 
 
 New graphs will replace existing ones in this window but all graphs created in the current session of R can be explored using the ![arrows icon](img/arrow_shortcut.png) icons. 
 
@@ -100,7 +102,7 @@ tenure_bar <- ggplot(data = ehs_tidy) +
 ggsave(tenure_bar, filename = "tenure_bar.png")
 ```
 
-## Exercise 7
+## Exercise 7 {.unnumbered}
 1. Choose an appropriate visualisation to check the distribution of the gross income variable from respondents of the English Housing survey. Comment on your findings.
 2. Based on the output from question 1, generate a summary table giving the minimum, maximum gross income, and an appropriate measure of the centre and spread of this variable.
 
@@ -111,14 +113,14 @@ Visual markings of a `ggplot` object can be customised as part of the `geom` fun
 - `colour`: change the colour (if point or line) or outline (if bar or histogram) of the geom
 - `size`: change the size of the markings (if point used)
 - `shape`: change the shape of markings (for points)
-- `fill`: Change the colour of bars in bar charts or histograms
-- `linewidth`: Change the line width
-- `linetype`: Choose the type of line (e.g. `dotted`)
-- `alpha`: Change the transparency of a visualisation
+- `fill`: change the colour of bars in bar charts or histograms
+- `linewidth`: change the line width
+- `linetype`: choose the type of line (e.g. `dotted`)
+- `alpha`: change the transparency of a geom
 
-These options can be used to add variables to a visualisation. For example, the distribution of tenure types could be compared between regions by changing the `fill` of these bars, converting the bar chart into a **stacked bar chart**. When these options are determined by a variable in the data, they should be added inside the `aes` wrapper. Options can also be adjusted manually when the arguments are added outside of the `aes` wrapper. 
+These options can be set manually or used to add variables to a visualisation. For example, the distribution of tenure types could be compared between regions by changing the `fill` of these bars, converting the bar chart into a **stacked bar chart**. When these options are determined by a variable in the data, they should be added inside the `aes` wrapper. Options can also be adjusted manually when the arguments are added outside of the `aes` wrapper. 
 
-To convert the previous bar chart into a stacked bar chart, we define the `fill` by the `region` variable. To make these distinctions easier to see, we can also add a black outline to the bars by manually setting `colour`:
+To convert the previous bar chart into a stacked bar chart, we define `fill` by the `region` variable. To make these distinctions easier to see, we can also add a black outline to the bars by manually setting `colour`:
 
 ```{r stacked bar chart tenure}
 ggplot(data = ehs_tidy) + 
@@ -152,8 +154,14 @@ For a more comprehensive list of the options available for the geom you are inte
 Although it may be tempting to add many variables to the same visualisation, be sure that you are not overcomplicating the graph and losing important messages. It is better to have multiple clear (but simpler) visualisations than fewer confusing ones.
 :::
 
+### A note on colour in visualisations {.unnumbered}
+The use of colour in visualisations can help highlight important messages, add variables to a graph, or make the visualisation stand out. However, unnecessary colours can distract from important data and make a message less clear.
 
-## Exercise 8
+Where colours are useful in a visualisation, ensure the choice of palette is **inclusive** and **accessible**. This means ensuring that colours are distinct to everyone, including those with a colour-vision deficiency, and avoid potentially harmful stereotypes. 
+
+To check a colour palette is inclusive, consider using a colour blindness simulator [such as this one](https://www.color-blindness.com/coblis-color-blindness-simulator/).
+
+## Exercise 8 {.unnumbered}
 Choose an appropriate visualisation to investigate the change in employment rate between 2008 and 2024. Generate this visualisation and comment on your findings.
 
 ```{r add time variable for plots, echo = FALSE}
@@ -175,7 +183,7 @@ For example, if we wanted to customise the x axis of the line graph generated in
 - `limits = c(...)` sets the axis limits
 - `breaks = c(...)` defines tick marks
 - `labels = c(...)` attaches labels to break values
-- `trans = ` transforms the scale that the axis is shown on. 
+- `transform = ` transforms the scale that the axis is shown on (for some older versions of `ggplot2`, this option is `trans` but has been overwritten in newer versions). 
 
 In this example, we can add labels to the x axis that shows which year the time variable represents, making it easier to interpret:
 
@@ -191,11 +199,11 @@ ggplot(data = obr_data) +
 ```
 
 ### Customising colour scales
-There are a wide range of options for customising the colour aesthetics of geoms. These include pre-defined colour palettes, such as `scale_colour_viridis_c` for continuous variables, or `scale_colour_viridis_d` for discrete or categorical variables. Viridis colour palettes are designed to be colourblind friendly and print well in grey scale. There are also many R packages containing colour palettes for different scenarios. 
+There are a wide range of options for customising the colour aesthetics of geoms. These include pre-defined colour palettes, such as `scale_colour_viridis_c` for continuous variables, or `scale_colour_viridis_d` for discrete or categorical variables. Viridis colour palettes are designed to be colourblind friendly and print well in grey scale. There are also many R packages containing colour palettes for different scenarios. [This website](https://r-graph-gallery.com/color-palette-finder) gives a list and preview of all palettes currently available.
 
-Colour palettes can be created manually for categorical variables using the `scale_colour_manual` function. Here, the argument `values` allows us to specify a colour per category. 
+Colour palettes can also be created manually for categorical variables using the `scale_colour_manual` function. Here, the argument `values` allows us to specify a colour per category. 
 
-Where a colour palette will be used across multiple plots, defining this list of colours as a vector and then entering this into `scale_fill_manual` will reduce repetition. For example, where region is used to group across multiple plots, it will be useful to create a region colour palette:
+Where a colour palette will be used across multiple plots, defining this list of colours as a vector and then entering this into `scale_fill_manual` will reduce repetitive coding. For example, where region is used to group across multiple plots, it will be useful to create a region colour palette:
 
 ```{r region colour palette}
 region_palette <- c("aquamarine2", "blue", "chartreuse2", "coral", "orchid",
@@ -239,6 +247,11 @@ annotate(“rect”, xmin = 0, xmax = 10, ymin = 20, ymax = 50, alpha = 0.2)
 
 adds a rectangle to the graph. 
 
+:::{.callout-tip}
+### Style tip
+Make use of annotations in visualisations to enhance important messages and draw readers' attention.
+:::
+
 ## Theme functions
 
 The `theme` function modifies non-data components of the visualisation. For example, the legend position, label fonts, the graph background, and gridlines. There are many options that exist within the `theme` function (use `?theme` to list them all). 
@@ -270,23 +283,28 @@ One benefit of using themes is that all visualisations will be consistent in ter
 ### Creating functions
 To create our own function in R, we first give it a name and attach `function()` followed by curly brackets `{}`, with the function defined inside those brackets.  
 
-For example, to create our own theme function, called `theme_dluch`, which sets the title font size to 15, the axis titles to size 12, the axis ticks to size 10, moves the legend to the bottom of the graph, and changes the background colours, we use the following:
+For example, to create our own theme function, called `theme_dluch`, which sets the title font size to 18, the axis and legend titles to size 15, the axis and legend text to size 12, adds just gridlines to the y-axis, and changes the background colours, we use the following:
 
 ```{r create a theme}
 theme_dluch <- function() {
   # Change plot title size
-  theme(plot.title = element_text(size = 15),
+  theme(plot.title = element_text(size = 18),
         # Change axis title size
-        axis.title = element_text(size = 12),
+        axis.title = element_text(size = 15),
         # Change axis text size
         axis.text = element_text(size = 12),
-        # Move legend to bottom of graph
-        legend.position = "bottom",
+        # Change legend text
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
         # Change background
-        plot.background = element_rect(fill = "grey75"),
+        plot.background = element_rect(fill = "thistle"),
+        # Change legend background to match
+        legend.background = element_rect(fill = "thistle"),
         # Change graph area background
         panel.background = element_rect(fill = "white", 
-                                        colour = "black"))
+                                        colour = "black"),
+        # Add tick major tick marks for the y axis (but not x)
+        panel.grid.major.y = element_line(colour = "grey55"))
 }
 ```
 
@@ -301,13 +319,21 @@ ggplot(data = ehs_tidy) +
            # Show bars side-by-side instead of stacked
            position = "dodge") +
   # Change legend title and add colour values
-  scale_fill_manual(name = "Region", values = region_palette) + 
+  scale_fill_manual(name = "Region", values = region_palette) +
+  # The change of font has made the labels unreadable, wrap them 
+  # onto a new line when too long
+  scale_x_discrete(labels = label_wrap_gen(12)) +
   labs(x = "Tenure type", y = "Count") +
   # Remove gridlines and axes (not recommended!!)
   theme_dluch()
 ```
 
 Creating a personalised theme ensures that visualisations are consistent, whilst keeping code concise and reducing repetition.
+
+### A note on visualisation styling and accessibility {.unnumbered}
+In all data visualisations, we want to make sure that the data are the most important element. We should aim to reduce all unnecessary clutter and design choices that do not enhance or add context to the data. This includes unnecessary patterns, colours, and gridlines. 
+
+Text must be legible to all readers, including those with visual impairments or learning difficulties. All text should be at least 12pt when the visualisation will be printed (e.g. in reports), or 36pt when included in a presentation. Do not choose a font family that is inaccessible.
 
 ## Facet functions
 Faceting allows us to divide a plot into subplots based on some grouping variable within the data. This allows us to show multiple variables in the same visualisation without risking overloading the plot and losing the intended message. 
@@ -317,20 +343,6 @@ For example, we could compare the relationship between gross income and tenure t
 :::{.callout-warning}
 Remember that the value 100,000 actually represents anyone earning £100,000 or more. To avoid skewing the data, we will remove these values and investigate trends below this threshold.
 :::
-
-```{r boxplot income tenure region}
-ehs_tidy %>% 
-  # Remove gross income >= £100,000
-  filter(gross_income != 100000) %>% 
-  # Do not need to specify data, it is already passed through the pipes
-  ggplot() +
-  geom_boxplot(aes(x = tenure_type, y = gross_income)) +
-  labs(x = "Tenure type", y = "Gross income (£)") +
-  facet_wrap( ~ region) +
-  theme_dluch()
-```
-
-Facetting has made the tenure type labels unreadable. To overcome this, we can 'wrap' the long labels using the `label_wrap_gen` function and setting an upper limit on the width of labels:
 
 ```{r boxplot income tenure region cleaner}
 ehs_tidy %>% 
@@ -344,6 +356,6 @@ ehs_tidy %>%
   facet_wrap( ~ region) 
 ```
 
-## Exercise 9
+## Exercise 9 {.unnumbered}
 Use an appropriate visualisation to investigate the relationship between house prices and wages between 2008 and now. Ensure that the variables you choose are comparable and treat this as though the final product will be exported into a report (make sure it is clear and looks good!). Interpret your final graph.
 

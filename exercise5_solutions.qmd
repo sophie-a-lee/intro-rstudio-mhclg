@@ -1,7 +1,4 @@
----
-title: "Exercise 5 solutions"
-format: html
----
+# Exercise 5 solutions
 
 ```{r setup, include = FALSE}
 pacman::p_load(tidyverse, readxl)
@@ -9,7 +6,7 @@ pacman::p_load(tidyverse, readxl)
 housing_market <- read_csv("saved_data/housing_market_tidy.csv")
 ```
 
-### Question 1
+## Question 1
 Load in the OBR's quarterly labour market data (sheet 1.6), keeping the following variables:
 
 - Period 
@@ -20,9 +17,9 @@ Load in the OBR's quarterly labour market data (sheet 1.6), keeping the followin
 - Real wage product 
 - Real consumption wage
 
-Split the period data into separate year and quarter variables, ensure that all variable names follow Tidyverse's style guide.
+Split the period data into separate year and quarter variables. Ensure that all variable names follow Tidyverse's style guide.
 
-### Solution
+### Solution {.unnumbered}
 Using the same approach as the housing market sheet, load the range of cells containing the data required, not including the variable names. Add variable names manually after selecting the variables required, then split the time variable into years and quarters.
 
 ```{r load labour market, message = FALSE}
@@ -48,10 +45,10 @@ labour_market <-
   select(-period)
 ```
 
-### Question 2
+## Question 2
 Load the OBR's national living wage data (sheet 1.14). 
 
-### Solution
+### Solution {.unnumbered}
 Using the same approach as earlier, load the correct sheet in, selecting cells with data included. Variable names cannot begin with numbers, so rename them either manually, or by adding a prefix. The `rename_with` function allows us to rename variables by applying a function to them, in this case `paste0` which combines elements in the function separated by commas:
 
 ```{r Load living wage data}

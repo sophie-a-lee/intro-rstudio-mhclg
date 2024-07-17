@@ -51,7 +51,7 @@ This window lists all data and objects currently loaded into R, and is not avail
 ### Window D: Files, plots, packages and help
 This window has many potential uses: plots are displayed and can be saved from here, and R help files will appear here. This window is only available in the RStudio interface and not in the basic R package.
 
-## Exercise 1
+## Exercise 1 {.unnumbered}
 
 1. Open a new script file if you have not already done so.
 2. Save this script file into an appropriate location.

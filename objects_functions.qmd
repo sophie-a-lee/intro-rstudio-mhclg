@@ -6,7 +6,7 @@ One of the main advantages to using R over other software packages such as SPSS 
 :::{.callout-tip}
 ### Style tip
 
-Object names should only contain lower case letters, numbers and `_` (instead of a space to separate words). The should be meaningful and concise.
+Object names should only contain lower case letters, numbers and `_` (instead of a space to separate words). They should be meaningful and concise.
 :::
 
 Objects are defined in R using the `<-` symbol or `=`. For example, 
@@ -15,7 +15,7 @@ Objects are defined in R using the `<-` symbol or `=`. For example,
 object_1 <- 81
 ```
 
-Creates an object in the environment named `object_1`, which takes the value `81`. This will appear in the environment window of the console (window C from the interface shown in the [introduction](introduction.qmd)). 
+Creates an object in the environment named `object_1`, which takes the value `81`. This will appear in the environment window of the console (window C from the interface shown in the [introduction](intro.qmd)). 
 
 :::{.callout-tip}
 ### Style tip

@@ -1,6 +1,6 @@
 # R syntax
 
-All analyses within R is carried out using syntax, the R programming language. It is important to note that R is case-sensitive so always ensure that you use the correct combination of upper and lower case letters when running functions or calling objects.
+All analyses within R are carried out using syntax, the R programming language. It is important to note that R is case-sensitive so always ensure that you use the correct combination of upper and lower case letters when running functions or calling objects.
 
 Any text written in the R console or script file can be treated the same as text from other documents or programmes: text can be highlighted, copied and pasted to make coding more efficient. 
 
@@ -23,7 +23,7 @@ For example:
 :::{.callout-note}
 ### Helpful hint
 
-To comment out chunks of code, highlight the rows and use the keyboard shortcut *ctrl + shift + c* on Windows, and *Command + shift + c* on Mac
+To comment out chunks of code, highlight the rows and use the keyboard shortcut `ctrl + shift + c` on Windows, and `Command + shift + c` on Mac
 :::
 
 The choice of brackets in R coding is particularly important as they all have different functions:
@@ -37,7 +37,7 @@ All standard notation for mathematical calculations (`+`, `-`, `*`, `/`, `^`, et
 ::: {.callout-tip}
 ### Style tip
 
-Although R will work whether a space is added before/after a mathematical operator, the [style guide](https://style.tidyverse.org/syntax.html) recommends to add them surrounding most mathematical operations (`+`, `-`, `*`, `/`), but not around `^`. 
+Although R will work whether a space is added before/after a mathematical operator, the [style guide](https://style.tidyverse.org/syntax.html) recommends to add spaces surrounding most mathematical operations (`+`, `-`, `*`, `/`), but not around `^`. 
 
 For example:
 
@@ -56,8 +56,9 @@ For example:
 ## Exercise 2
 
 1.	Add your name and the date to the top of your script file (hint: comment this out so R does not try to run it)
-2.	Use R to answer to following and write the answers within the script file:
+2.	Use R to answer to following sums:
   a. $64^2$
   b. $3432 \div 8$
   c. $96 \times 72$
  
+For each part of question 2, copy the result from the console and paste them onto the same line of the script file as the code. Do this in a way that ensures there are no error messages if you were to run the entire script file.

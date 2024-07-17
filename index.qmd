@@ -11,3 +11,8 @@ Throughout the course, we will discuss best practices for reproducible data anal
 
 Throughout the notes, you will see boxes with 'style tips'. These are to ensure that your code follows the [Tidyverse style guide](https://style.tidyverse.org/index.html), and ensuring your code adhered to [Analysis Standards](https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html).
 :::
+
+## Data for the course
+This course uses data from the English Housing Survey (EHS) from 2021 and the Office for Budget Responsibility (OBR) 2024 economic and fiscal outlook. All data used in the course can be downloaded from the [course repository](https://github.com/sophie-a-lee/introduction_rstudio_dluch/tree/main/data). 
+
+Before beginning the course, please save these files into a folder called 'data' within the folder you will be working from during the course.

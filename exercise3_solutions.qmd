@@ -1,13 +1,10 @@
----
-title: "Exercise 3 solutions"
-format: html
----
+# Exercise 3 solutions
 
 ```{r setup, include = FALSE}
 pacman::p_load(tidyverse, haven)
 ```
 
-### Question 1
+## Question 1
 You have been provided with another .sav file which contains the interview responses from the EHS. Create and save a tidy version of this dataset, ensuring variables are classified as the correct type and names follow the style conventions (if you cannot remember these, check [here](https://style.tidyverse.org/syntax.html) for a reminder.
 
 The variables we need in the tidy dataset are:
@@ -19,7 +16,7 @@ The variables we need in the tidy dataset are:
 - Whether the property is freehold or leasehold `freeLeas`
 
 
-### Solution
+### Solution {.unnumbered}
 The first step is to load in the data. However, before this, we need the name of the file. We can look into our documents to get this, but the `list.files` function will do it for us:
 
 ```{r list.files to get file name}
@@ -76,7 +73,7 @@ ehs_interview_tidy <- read_spss("data/interviewfs21_EUL.sav") %>%
 ## Question 2
 Save the tidy interview dataset as a csv file with an appropriate file name.
 
-## Solution
+### Solution {.unnumbered}
 ```{r save tidy interview data as a csv file}
 write_csv(ehs_interview_tidy, file = "saved_data/ehs_interview_tidy.csv")
 ```
@@ -88,7 +85,7 @@ Using the new, tidy dataset, answer the following questions:
 - How many respondents did not give a response to either the weekly rent or weekly mortgage question?
 - What is the highest household gross income of these responders? 
 
-## Solution
+### Solution {.unnumbered}
 For the first two part, we use the `filter` function to return a subgroup matching the condition, and combine this with the `count` function that counts the number of rows in a tibble:
 
 ```{r count rows}
@@ -111,4 +108,4 @@ The final part could usually be carried out with the base R `max` function:
 max(ehs_interview_tidy$gross_income)
 ```
 
-However, the labels attached to the SPSS file showed that a value of 100000 actually represents a group. Therefore, we cannot answer this question from the available data. We must also be careful when analysing this variable as failure to remove account for this will skew the data (assuming that anyone earning over £100,000 actually earns exactly £100,000).
+However, the labels attached to the SPSS file showed that a value of 100000 actually represents a group of responders earning at least £100,000. Therefore, we cannot answer this question from the available data. If we were to analyse this variable, we would need to categorise the rest of the data, losing a lot of information. Failure to do this would produce invalid results.

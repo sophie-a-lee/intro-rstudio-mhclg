@@ -5,7 +5,7 @@ pacman::p_load(tidyverse, haven)
 ```
 
 ## Combining multiple datasets
-Both the SPSS datasets we have been working with so far have contained different information about the English Housing Survey (EHS). We will need to join these together to create a single analysis dataset with all the information we need. 
+Both the SPSS datasets we have been working with so far have contained different information about the English Housing Survey (EHS). We will join these together to create a single analysis dataset with all the information we need. 
 
 First we need to reload the tidy datasets we saved previously (now using the `read_csv` function):
 
@@ -56,15 +56,15 @@ The `summarise` function is set up similarly to the `mutate` function: summaries
 
 Common examples of summary functions include:
 
-- `mean`
-- `median`
-- `range` (gives the minimum and maximum values)
-- `min`
-- `max`
-- `IQR` (interquartile range, gives the range of the middle 50% of the sample)
-- `sd` (standard deviation, a measure of the spread when data are normally distributed)
-- `sum` 
-- `n` (counts the number of rows the summary is calculated from)
+- `mean`: a measure of centre when data are normally distributed
+- `median`: a measure of centre, whatever the distribution
+- `range`: the minimum and maximum values
+- `min`: minimum
+- `max`: maximum
+- `IQR`: interquartile range, gives the range of the middle 50% of the sample
+- `sd`: standard deviation, a measure of the spread when data are normally distributed
+- `sum`
+- `n`: the number of rows the summary is calculated from
 
 For example, if we want to generate summaries of the gross household income using the entire dataset:
 
@@ -79,8 +79,8 @@ summarise(ehs_tidy,
 
 The `summarise` function can be used to produce grouped summaries. This is done by first grouping the data with the `group_by` function. 
 
-:::{.callback-warning}
-Whenever using `group_by`, make sure to `ungroup` the data before proceeding. The grouping structure can be large and slow analysis, or may interact with other functions to produce unexpected analyses.
+:::{.callout-warning}
+Whenever using `group_by`, make sure to `ungroup` the data before proceeding. The grouping structure can be large and slow analysis, or may interact with other functions to produce unexpected results.
 :::
 
 For example, we can expand the gross income summary table to show these summaries separated by region:
@@ -117,7 +117,7 @@ ehs_tidy %>%
          prop_tenure = n_tenancy / n_responses)
 ```
 
-From this summary table, the proportion of responders that lived in privately rented properties was 0.1779. To convert this into a percentage, we multiple the proportions by 100%:
+From this summary table, the proportion of responders that lived in privately rented properties was 0.178. To convert this into a percentage, we multiple the proportions by 100%:
 
 ```{r percentage private rent}
 ehs_tidy %>% 
@@ -134,12 +134,12 @@ ehs_tidy %>%
          perc_tenure = prop_tenure * 100)
 ```
 
-Therefore, 17.79% of responders lived in privately rented properties. 
+Therefore, 17.8% of responders lived in privately rented properties. 
 
 ### Summarising numeric variables
 Numeric variables are typically summarised using the centre of the variable, also known as the average, and a measure of the spread of the variable. The most appropriate choice of summary statistics will depend on the distribution of the variable. More specifically, whether the numeric variable is normally distributed or not. The shape/distribution of a variable is typically investigated by plotting data in a histogram.
 
-#### Measures of centre
+#### Measures of centre {.unnumbered}
 The average of a numeric variable is another way of saying the centre of its distribution. Often, people will think of the **mean** when trying to calculate an average, however this may not always be the case. 
 
 ```{r normal distribution, echo = FALSE}
@@ -150,23 +150,25 @@ normal_sd <- data.frame(x = x,
                         y01 = dnorm(x, sd = 0.1))
 
 ggplot(data = normal_sd) + 
-  geom_line(aes(x = x, y = y1), linewidth = 1) +
+  geom_density(aes(x = x, y = y1), stat = "identity",
+               linewidth = 1, fill = "thistle") +
   scale_x_continuous(breaks = -3:3, 
                      labels = c("-3SD", "-2SD", "-1SD", "Mean", "+1SD", 
                                 "+2SD", "+3SD")) +
   labs(x = "", y = "") +
   theme_light() +
   theme(axis.line.y = element_blank(),
-        axis.text.y = element_blank())
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 12))
 ```
 
 When data are normally distributed, the mean is the central peak of the distribution. This is calculated by adding together all numbers in the sample and dividing it by the sample size. 
 
-However, when the sample is not normally distributed and the peak does not lie in the middle, extreme values or a longer tail will pull the mean towards it. This means that where data are not normally distributed, the mean will not be the centre and the value will be invalid. Where this is the case, the **median** should be used instead. The median is calculated by ordering the numeric values from smallest to largest and selecting the middle value.
+However, when the sample is not normally distributed and the peak does not lie in the middle, extreme values or a longer tail will pull the mean towards it. Where data are not normally distributed, the mean will not be the centre and the value will be invalid. When this is the case, the **median** should be used instead. The median is calculated by ordering the numeric values from smallest to largest and selecting the middle value.
 
 When data are normally distributed, the mean and median will give the same, or very similar, values. This is because both are measuring the centre. However, when the data are skewed, the mean and median will differ. We prefer to use the mean where possible as it is the more powerful measure. This means that it uses more of the data than the median and is therefore more sensitive to changes in the sample.
 
-#### Measures of spread
+#### Measures of spread {.unnumbered}
 Generally the measure of the spread of a numeric variable is presented with a measure of spread, or how wide/narrow the distribution is. As with the apread, the most appropriate values will depend on whether the sample is normally distributed or not. 
 
 The most simple measure of spread is the **range** of a sample. In R, this is given as two values: the minimum and the maximum. 
@@ -181,35 +183,57 @@ Both the range and IQR only use 2 values from the sample. As with the median, th
 ggplot(normal_sd) +
   geom_line(aes(x = x, y = y1), linewidth = 1) +
   labs(x = "", y = "") + 
-  theme_light()
+  theme_light() +
+  theme(axis.text = element_text(size = 12))
 
 ggplot(normal_sd) +
   geom_line(aes(x = x, y = y01), linewidth = 1) +
   labs(x = "", y = "") + 
-  theme_light() 
+  theme_light() +
+  theme(axis.text = element_text( size = 12))
 
 ```
 
-The standard deviation is only appropriate where a numeric variable has a normal distribution, otherwise this value is meaningless. If a sample is normally distributed, then the entire sample can be completely described just using the mean and standard deviation, even when the sample values are not given. As the distribution is symmetrical, the mean and standard deviation can be used to estimate ranges of values. For example, it is known that approximately 68% of a sample will lie one standard deviation from the mean, approximately 95% within 2 standard deviations from the mean, and around 99.7% within 3 standard deviations:
+The standard deviation is only appropriate where a numeric variable has a normal distribution, otherwise this value is meaningless.
+
+#### Properties of the normal distribution {.unnumbered}
+ 
+If a sample is normally distributed, then it can be completely described using the mean and standard deviation, even when the sample values are not given. As the distribution is symmetrical, the mean and standard deviation can be used to estimate ranges of values. 
+
+For example, it is known that approximately 68% of a sample will lie one standard deviation from the mean, approximately 95% within 2 standard deviations from the mean, and around 99.7% within 3 standard deviations:
 
 ```{r normal with sd ranges, echo = FALSE}
+normal_sd <- mutate(normal_sd,
+       y2 = c(rep(0, 25), y1[26:75], rep(0, 25)))
+
 ggplot(data = normal_sd) + 
-  geom_line(aes(x = x, y = y1), linewidth = 1) +
+  geom_density(aes(x = x, y = y2), linewidth = 1,
+               stat = "identity", fill = "#efc3e6") +
+  geom_line(aes(x = x, y = y1), linewidth = 1,
+                stat = "identity") +
   scale_x_continuous(breaks = -3:3, 
-                     labels = c("", "", "", "Mean", "", 
-                                "", "")) +
-  labs(x = "", y = "") +
+                     labels = c("", "-2se", "", "Mean", "", 
+                                "2se", "")) +
+  annotate("text", x = 0, y = 0.2, label = "95%", size = 7) +
   theme_light() +
   theme(axis.line.y = element_blank(),
-        axis.text.y = element_blank())
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        axis.text.x = element_text(size = 12))
 ```
 
 This knowledge can also be used to check the mean and standard deviation were appropriate summary statistics, even if we have no other information. 
 
-## Exercise 4
-1. How many responders had both weekly rent and mortgage payments given? What are the potential reasons for this?
+## Exercise 4 {.unnumbered}
+1. How many respondents had both weekly rent and mortgage payments given? What are the potential reasons for this?
 
 2. Combine the weekly rent and mortgage variables into a single weekly payment variable.
+
+:::{.callout-tip}
+### Hint
+
+Use all available resources, including help files and [cheatsheets](https://rstudio.github.io/cheatsheets/data-transformation.pdf) if you are struggling to find a function to do this.
+:::
 
 3. Create a summary table containing the mean, median, standard deviation, and the upper and lower quartiles of the weekly payment (rent and mortgage combined) for each region. What, if anything, can you infer about the distribution of this variable based on the table?
 
