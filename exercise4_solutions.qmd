@@ -1,7 +1,11 @@
+---
+code-annotations: hover
+---
+
 # Exercise 4 solutions
 
 ```{r setup, include = FALSE}
-pacman::p_load(tidyverse, haven)
+pacman::p_load(tidyverse, haven, Hmisc)
 
 ehs_tidy <- read_csv("saved_data/ehs_tidy.csv") %>% 
   mutate(across(where(is.character), factor))
@@ -42,28 +46,15 @@ There are a few different ways to do this. The first is to include an `if_else` 
 
 ```{r weekly total if_else}
 ehs_tidy_ex4 <- ehs_tidy %>% 
-  # if either weekly_rent or weekly_mortgage are missing
-  mutate(weekly_total = if_else(is.na(weekly_rent) | is.na(weekly_mortgage), 
-                                # return the non-missing value
-                                coalesce(weekly_rent, weekly_mortgage), 
-                                # if neither are missing, add the variables together
-                                weekly_rent + weekly_mortgage))
+  mutate(weekly_total = if_else(is.na(weekly_rent) | #<1>
+                                  is.na(weekly_mortgage), #<1>
+                                coalesce(weekly_rent, weekly_mortgage), #<2>
+                                weekly_rent + weekly_mortgage)) #<3>
 ```
 
-An alternative would be to use `rowwise` which groups data by rows and carries out operations across rows rather than columns. This can be combined with the `sum` function which contains the optional `na.rm` argument to remove missing values:
-
-```{r weekly total rowwise, eval = FALSE}
-ehs_tidy_ex4 <- ehs_tidy %>% 
-  # group data by rows
-  rowwise() %>% 
-  # add totals by using the sum function which has the argument na.rm to remove missing data
-  mutate(weekly_total = sum(weekly_rent, weekly_mortgage, na.rm = TRUE))
-```
-
-:::{.callout-warning}
-In this case, we cannot use the `rowwise` option as it replaces missing values with zeros. Some of the households missing both rent and mortgage values may be a result of an incomplete survey rather than no payments. To avoid this, we will use `if_else` to create the newest variable.
-:::
-
+1. If either `weekly_rent` or `weekly_mortgage` are missing
+2. Then return the non-missing value
+3. Or else (if both are NOT missing), return the sum of these values
 
 ## Question 3
 Create a summary table containing the mean, median, standard deviation, and the upper and lower quartiles of the weekly payment (rent and mortgage combined) for each region. What, if anything, can you infer about the distribution of this variable based on the table?
@@ -71,20 +62,29 @@ Create a summary table containing the mean, median, standard deviation, and the 
 ### Solution {.unnumbered}
 ```{r summarise total payments}
 ehs_tidy_ex4 %>% 
-  # Give summaries by region
-  group_by(region) %>% 
-  # List summaries required
-  summarise(mean_payment = mean(weekly_total, na.rm = TRUE),
-            median_payment = median(weekly_total, na.rm = TRUE),
-            sd_payment = sd(weekly_total, na.rm = TRUE),
-            lq_payment = quantile(weekly_total, .25, na.rm = TRUE),
-            uq_payment = quantile(weekly_total, .75, na.rm = TRUE)) %>%
-  # Be sure to remove the grouping!
-  ungroup()
+  group_by(region) %>% #<1>
+  summarise(mean_payment = wtd.mean(weekly_total, weights = weighting, #<2>
+                                    na.rm = TRUE), #<2>
+            median_payment = wtd.quantile(weekly_total, #<3>
+                                          weights = weighting, #<3>
+                                          probs = .5, na.rm = TRUE), #<3>
+            sd_payment = sqrt(wtd.var(weekly_total, weights = weighting, #<4>
+                                      na.rm = TRUE)), #<4>
+            lq_payment = wtd.quantile(weekly_total, weights = weighting, #<5>
+                                      probs = .25, na.rm = TRUE), #<5>
+            uq_payment = quantile(weekly_total, weights = weighting, #<6>
+                                  probs = .75, na.rm = TRUE)) %>% #<6>
+  ungroup() #<7> 
 ```
 
-There are big differences between most mean and medians across regions, indicating that the data are not normally distributed. If we use the approximate 95% range formula (mean $\pm$ (2 $\times$ sd)), we would get negative values for all regions. Negative payments do not make sense in this context, confirming that the data are not normally distributed. 
+1. Calculate summaries per region
+2. Return the weighted mean
+3. Return the weighted median (the 50th percentile)
+4. Return the weighted standard deviation (the square root of the weighted variance)
+5. Return the weighted lower quartile (the 25th percentile)
+6. Return the weighted upper quartile (the 75th percentile)
+7. Don't forget to `ungroup`
+
+There are big differences between most mean and medians across regions, indicating that the data are not normally distributed. If we use the approximate 95% range formula (mean $\pm$ (2 $\times$ sd)), we would get negative values for almost all regions. Negative payments do not make sense in this context, confirming that the data are not normally distributed. 
 
 In this case, the median and IQR should be give, not the mean and standard deviation.
-
-

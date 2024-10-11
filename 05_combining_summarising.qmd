@@ -1,0 +1,310 @@
+---
+code-annotations: hover
+---
+
+# Combining and summarising datasets
+
+```{r setup and load data, echo = FALSE}
+pacman::p_load(tidyverse, haven)
+
+read_spss("data/interviewfs21_EUL.sav") %>% 
+  select(serialanon, HYEARGRx, lenresb, rentwkx, mortwkx, freeLeas) %>% 
+  mutate(length_residence = as_factor(lenresb),
+         freehold_leasehold = as_factor(freeLeas)) %>% 
+  rename(id = serialanon,
+         gross_income = HYEARGRx,
+         weekly_rent = rentwkx,
+         weekly_mortgage = mortwkx) %>% 
+  select(id, gross_income, length_residence, weekly_rent, weekly_mortgage, 
+         freehold_leasehold) %>% 
+  write_csv(file = "saved_data/ehs_interview_tidy.csv")
+```
+
+## Combining multiple datasets
+Both the SPSS datasets we have been working with so far have contained different information about the English Housing Survey (EHS). We will join these together to create a single analysis dataset with all the information we need. 
+
+First we need to reload the tidy datasets we saved previously (now using the `read_csv` function):
+
+```{r load ehs data, message=FALSE}
+ehs_general_tidy <- read_csv("saved_data/ehs_general_tidy.csv")
+ehs_interview_tidy <- read_csv("saved_data/ehs_interview_tidy.csv")
+```
+ 
+Notice that by default, the variables that were classed as factors have been recognised by R as `chr` (character). This is because CSV files are unable to store the grouping attributes that were created in R. Therefore, when we load in CSV files, we need to use the `mutate` function to re-classify these variables.
+
+When we need to apply the same function to a group of variables within a dataset, the `mutate` function can be combined with `across`, which uses selection helpers (see `?dplyr_tidy_select`) and retains the original variable names:
+
+```{r load ehs data and reclassify, message = FALSE}
+ehs_general_tidy <- read_csv("saved_data/ehs_general_tidy.csv") %>% 
+  mutate(across(where(is.character), factor))
+
+
+ehs_interview_tidy <- read_csv("saved_data/ehs_interview_tidy.csv") %>% 
+  mutate(across(where(is.character), factor))
+```
+
+:::{.stylebox}
+
+::::{.stylebox-header}
+:::::{.stylebox-icon}
+:::::
+Style tip
+::::
+
+::::{.stylebox-body}
+When writing script files, we want our code to be as concise and efficient as possible. Although we could use mutate to apply the `factor` function to each of the categorical variables, using the wrapper `across` reduces the amount of code needed and, consequently, the risk of errors. 
+::::
+
+:::
+
+Joining datasets can be carried out using `join` functions. There are 4 options we can choose from depending on which observations we want to keep if not all of them are matched (see `?full_join` for a full list of options). 
+
+In this example, we want to keep all observations, even if they are missing from one of the datasets. This requires the `full_join` function. Both datasets contain a unique identifier which can be included in the `full_join` function to ensure we are joining like-for-like:
+
+```{r join ehs data}
+ehs_tidy <- full_join(ehs_general_tidy, ehs_interview_tidy,
+                      by = "id") 
+
+head(ehs_tidy)
+```
+
+```{r save ehs_tidy, echo = FALSE}
+write_csv(ehs_tidy, file = "saved_data/ehs_tidy.csv")
+```
+
+
+## Summarising data
+Summary tables can be created using the `summarise` function. This returns tables in a tibble format, meaning they can easily be customised and exported as CSV files (using the `write_csv` function). 
+
+The `summarise` function is set up similarly to the `mutate` function: summaries are listed and given variable names, separated by a comma. The difference between these functions is that `summarise` collapses the tibble into a single summary, and the new variables must be created using a summary function.
+
+Common examples of summary functions include:
+
+- `mean`: a measure of centre when data are normally distributed
+- `median`: a measure of centre, whatever the distribution
+- `range`: the minimum and maximum values
+- `min`: minimum
+- `max`: maximum
+- `IQR`: interquartile range, gives the range of the middle 50% of the sample
+- `sd`: standard deviation, a measure of the spread when data are normally distributed
+- `sum`
+- `n`: the number of rows the summary is calculated from
+
+For example, if we want to generate summaries of the gross household income using the entire dataset:
+
+```{r summarise ehs total}
+summarise(ehs_tidy,
+          total_income = sum(gross_income),
+          median_income = median(gross_income),
+          n_rows = n())
+
+
+```
+
+The `summarise` function can be used to produce grouped summaries. This is done by first grouping the data with the `group_by` function. 
+
+:::{.callout-warning}
+Whenever using `group_by`, make sure to `ungroup` the data before proceeding. The grouping structure can be large and slow analysis, or may interact with other functions to produce unexpected results.
+:::
+
+For example, we can expand the gross income summary table to show these summaries separated by region:
+
+```{r summary gross income by region}
+ehs_tidy %>% 
+  group_by(region) %>% 
+  summarise(total_income = sum(gross_income),
+            median_income = median(gross_income),
+            n_rows = n()) %>% 
+  ungroup()
+```
+
+Before creating summary tables, it is important to consider the most appropriate choice of summary statistics for your data. 
+
+### Summarising weighted data
+The English Housing Survey is weighted to take account of the over-sampling of the less prevalent tenure groups and differential non-response, in order to provide unbiased national estimates. To account for this weighting (given by the `weighting` variable), we can use summary functions such as `wtd.mean` and `wtd.quantile` from the `Hmisc` R package:
+
+```{r}
+#| label: weighted-summary
+#| warning: false
+#| message: false
+
+
+library(Hmisc)
+
+summarise(ehs_tidy,
+          mean_income_unwtd = mean(gross_income),
+          mean_income_wtd = wtd.mean(gross_income, weights = weighting),
+          median_income_unwtd = median(gross_income),
+          median_income_wtd = wtd.quantile(gross_income, 
+                                           weights = weighting,
+                                           probs = .5))
+```
+
+The weighted total income is calculated by summing the product of each household income and its weight. As this variable does not currently exist within the dataset, we would need to create this first before summarising the sample:
+
+```{r weighted summary total}
+library(Hmisc)
+
+ehs_tidy %>% 
+  mutate(wtd_income = gross_income * weighting) %>% 
+  summarise(mean_income_unwtd = mean(gross_income),
+            mean_income_wtd = wtd.mean(gross_income, weights = weighting),
+            median_income_unwtd = median(gross_income),
+            median_income_wtd = wtd.quantile(gross_income, 
+                                             weights = weighting,
+                                             probs = .5),
+            total_income_unwtd = sum(gross_income),
+            total_income_wtd = sum(wtd_income))
+```
+
+### Summarising categorical data
+To summarise a single categorical variable, we simply need to quantify the distribution of observations lying in each group. The simplest way to do this is to count the number of observations that lie in each group. However, a simple count can be difficult to interpret without proper context. Often, we wish to present these counts relative to the total sample that they are taken from.
+
+The proportion of observations in a given group is estimated as the number in the group divided by the total sample size. This gives a value between 0 and 1. Multiplying the proportion by 100 will give the percentage in each group, taking the value between 0 and 100%.
+
+For example, to calculate the proportion of respondents that live in privately rented properties, we divide the total number in that group by the total number of respondents:
+
+```{r proportion of private rent}
+ehs_tidy %>% 
+  group_by(tenure_type) %>% #<1>
+  summarise(n_tenancy = n()) %>% #<2> 
+  ungroup() %>%  #<3>
+  mutate(n_responses = sum(n_tenancy), #<4>
+         prop_tenure = n_tenancy / n_responses) #<4>
+```
+
+
+1. First group the data by tenure type
+2. Then count the number of rows in each of these group (types)
+3. Be sure to ungroup to remove this structure!
+4. Now calculate the total number of respondents overall and divide the group total by the overall total
+
+
+From this summary table, the proportion of responders that lived in privately rented properties was 0.178. To convert this into a percentage, we multiple the proportions by 100%:
+
+```{r percentage private rent}
+ehs_tidy %>% 
+  group_by(tenure_type) %>% 
+  summarise(n_tenancy = n()) %>% 
+  ungroup() %>% 
+  mutate(n_responses = sum(n_tenancy),
+         prop_tenure = n_tenancy / n_responses,
+         perc_tenure = prop_tenure * 100)
+```
+
+Therefore, 17.8% of responders lived in privately rented properties. 
+
+### Summarising numeric variables
+Numeric variables are typically summarised using the centre of the variable, also known as the average, and a measure of the spread of the variable. The most appropriate choice of summary statistics will depend on the distribution of the variable. More specifically, whether the numeric variable is normally distributed or not. The shape/distribution of a variable is typically investigated by plotting data in a histogram.
+
+#### Measures of centre {.unnumbered}
+The average of a numeric variable is another way of saying the centre of its distribution. Often, people will think of the **mean** when trying to calculate an average, however this may not always be the case. 
+
+```{r normal distribution, echo = FALSE}
+x <- seq(-4, 4, length=100)
+
+normal_sd <- data.frame(x = x, 
+                        y1 = dnorm(x),
+                        y01 = dnorm(x, sd = 0.1))
+
+ggplot(data = normal_sd) + 
+  geom_density(aes(x = x, y = y1), stat = "identity",
+               linewidth = 1, fill = "thistle") +
+  scale_x_continuous(breaks = -3:3, 
+                     labels = c("-3SD", "-2SD", "-1SD", "Mean", "+1SD", 
+                                "+2SD", "+3SD")) +
+  labs(x = "", y = "") +
+  theme_light() +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 12))
+```
+
+When data are normally distributed, the mean is the central peak of the distribution. This is calculated by adding together all numbers in the sample and dividing it by the sample size. 
+
+However, when the sample is not normally distributed and the peak does not lie in the middle, extreme values or a longer tail will pull the mean towards it. Where data are not normally distributed, the mean will not be the centre and the value will be invalid. When this is the case, the **median** should be used instead. The median is calculated by ordering the numeric values from smallest to largest and selecting the middle value.
+
+When data are normally distributed, the mean and median will give the same, or very similar, values. This is because both are measuring the centre. However, when the data are skewed, the mean and median will differ. We prefer to use the mean where possible as it is the more powerful measure. This means that it uses more of the data than the median and is therefore more sensitive to changes in the sample.
+
+#### Measures of spread {.unnumbered}
+Generally the measure of the spread of a numeric variable is presented with a measure of spread, or how wide/narrow the distribution is. As with the apread, the most appropriate values will depend on whether the sample is normally distributed or not. 
+
+The most simple measure of spread is the **range** of a sample. In R, this is given as two values: the minimum and the maximum. 
+
+The issue with using the range is that it is entirely defined by the most extreme values in the sample and does not give any information about the rest of it. An alternative to this would be to give the range of the middle 50%, also known as the **interquartile range** (IQR). 
+
+The IQR is the difference between the 75th percentile, or upper quartile, and the 25th percentile, or lower quartile. As with the median, this is calculated by ordering the sample from smallest to largest. The sample is then cut into 4 and the quartiles are calculated. In R, the IQR is given as the difference between the upper and lower quartiles. To calculate these values separately, we can use the `quantile` function.
+
+Both the range and IQR only use 2 values from the sample. As with the median, these measures discard a lot of information from the summaries. Where the sample is normally distributed, the **standard deviation** (SD) can be used which measures the average distance between each observation and the mean. The larger the SD, the wider and flatter the normal curve will be; the smaller the SD, the narrower and taller the curve will be:
+
+```{r normal distribution different sd, echo = FALSE}
+ggplot(normal_sd) +
+  geom_line(aes(x = x, y = y1), linewidth = 1) +
+  labs(x = "", y = "") + 
+  theme_light() +
+  theme(axis.text = element_text(size = 12))
+
+ggplot(normal_sd) +
+  geom_line(aes(x = x, y = y01), linewidth = 1) +
+  labs(x = "", y = "") + 
+  theme_light() +
+  theme(axis.text = element_text( size = 12))
+
+```
+
+The standard deviation is only appropriate where a numeric variable has a normal distribution, otherwise this value is meaningless.
+
+#### Properties of the normal distribution {.unnumbered}
+ 
+If a sample is normally distributed, then it can be completely described using the mean and standard deviation, even when the sample values are not given. As the distribution is symmetrical, the mean and standard deviation can be used to estimate ranges of values. 
+
+For example, it is known that approximately 68% of a sample will lie one standard deviation from the mean, approximately 95% within 2 standard deviations from the mean, and around 99.7% within 3 standard deviations:
+
+```{r normal with sd ranges, echo = FALSE}
+normal_sd <- mutate(normal_sd,
+       y2 = c(rep(0, 25), y1[26:75], rep(0, 25)))
+
+ggplot(data = normal_sd) + 
+  geom_density(aes(x = x, y = y2), linewidth = 1,
+               stat = "identity", fill = "#efc3e6") +
+  geom_line(aes(x = x, y = y1), linewidth = 1,
+                stat = "identity") +
+  scale_x_continuous(breaks = -3:3, 
+                     labels = c("", "-2se", "", "Mean", "", 
+                                "2se", "")) +
+  annotate("text", x = 0, y = 0.2, label = "95%", size = 7) +
+  theme_light() +
+  theme(axis.line.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        axis.text.x = element_text(size = 12))
+```
+
+This knowledge can also be used to check the mean and standard deviation were appropriate summary statistics, even if we have no other information. 
+
+## Exercise 4 {.unnumbered}
+1. How many respondents had both weekly rent and mortgage payments given? What are the potential reasons for this?
+
+:::{.callout-caution collapse="true"}
+## Exercise hint
+
+`filter` the data to return a subgroup of respondents with both weekly rent and mortgage payments, then `count` the number of rows in this subgroup.
+:::
+
+2. Combine the weekly rent and mortgage variables into a single weekly payment variable.
+
+:::{.callout-caution collapse="true"}
+### Exercise hint
+
+This exercise requires a new variable to be created that contains the sum of weekly rent and mortgage payments `if` both are observed, `else` it will take the observed value if just one is observed, or will remain missing if both are missing. 
+
+You will need a function that creates variables based on `if` and `else` conditions, and one that will take the first non-NA value. Both of these can be found in the [`dplyr` cheatsheet](https://github.com/rstudio/cheatsheets/blob/main/data-transformation.pdf) or as useful functions listed in the `mutate` help file. 
+:::
+
+3. Create a summary table containing the mean, median, standard deviation, and the upper and lower quartiles of the weekly payment (rent and mortgage combined) for each region. What, if anything, can you infer about the distribution of this variable based on the table?
+
+:::{.callout-caution collapse="true"}
+## Exercise hint
+
+Remember to estimate weighted summary statistics when dealing with the EHS data. Although there is not a weighted standard deviation function in the `Hmisc` package, consider that standard deviation is the square root of the variance.
+:::

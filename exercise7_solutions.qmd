@@ -1,55 +1,32 @@
+---
+code-annotations: hover
+---
+
 # Exercise 7 solutions
 
 ```{r setup, include = FALSE}
 pacman::p_load(tidyverse)
 
-ehs_tidy <- read_csv("saved_data/ehs_tidy.csv")
+obr_data <- read_csv("saved_data/obr_data.csv") 
 ```
 
 
 ## Question 1
-Choose an appropriate visualisation to check the distribution of the gross income variable from respondents of the English Housing survey. Comment on your findings.
+Choose an appropriate visualisation to investigate the change in household disposable income between 2012 and 2024. Comment on your findings.
 
 ### Solution {.unnumbered}
-The most appropriate visualisation to check the distribution of a numeric variable is a **histogram**. This can be created using the `geom_histogram` function within `ggplot2`:
+An appropriate visualisation to investigate how a continuous variable changes across time is a line graph. This can be created using the `geom_line` function and requires the disposable income on the y-axis and a time variable on the x. The dataset does not currently contain an appropriate time variable that takes account of both the year and the quarter. Therefore, we will need to create one before we generate the plot:
 
-```{r histogram of gross income inc category, message = FALSE}
-ggplot(data = ehs_tidy) +
-  geom_histogram(aes(x = gross_income))
+```{r}
+#| label: disp-inc-line
+
+obr_data %>% 
+  mutate(time = year + ((quarter - 1) * .25)) %>%  #<1> 
+  ggplot() + #<2>
+  geom_line(aes(x = time, y = disposable_income))
 ```
 
-The histogram shows a strange peak at £100,000. This is because a value of 100000 in this data actually represents any household with a gross income of £100,000 or more. To avoid this distorting our visualisation and any future analysis, we will remove any observations with this value and save it as a new dataset:
+1. Create a time variable that takes the value of the `year` for the first `quarter`, and then increases by .25 for each subsequent `quarter`
+2. The data has already been specified by piping it into the `ggplot` function
 
-```{r remove gross income 100000} 
-ehs_tidy_new <- filter(ehs_tidy,
-                       gross_income != 100000)
-```
-
-:::{.callout-warning}
-Removing these observations means losing all of the information recorded on these respondents. We always want to keep the data in its fullest form where possible. Where we need a categorical versions of this variable, this can be included within the same dataset but **always keep the raw data**.
-:::
-
-```{r histogram no 100000, message = FALSE}
-ggplot(data = ehs_tidy_new) +
-  geom_histogram(aes(x = gross_income))
-```
-
-The gross income of respondents (that earned less than £100,000) is not normally distributed. The upper tail is longer than the lower tail, making this variable positively/upwardly/right skewed.
-
-## Question 2
-Based on the output from question 1, generate a summary table giving the minimum, maximum gross income, and an appropriate measure of the centre and spread of this variable.
-
-### Solution {.unnumbered}
-In question 1, we saw that the variable was not normally distributed, making the mean and standard deviation inappropriate summary measures. As an alternative, we will display the median as a measure of centre, and the interquartile range (IQR) as a measure of spread. 
-
-To create a summary table, use the `summarise` function. Be sure to use the data without the categorised income to avoid invalid results:
-
-```{r summary table}
-summarise(ehs_tidy_new,
-  min_income = min(gross_income),
-  max_income = max(gross_income),
-  median_income = median(gross_income),
-  iqr_income = IQR(gross_income))
-```
-
-
+Disposable income has increased over the past 12 years, with small decreases around 2020 and in the first period of 2024.

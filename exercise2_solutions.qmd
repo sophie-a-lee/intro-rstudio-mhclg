@@ -1,0 +1,42 @@
+# Exercise 2 solutions
+
+## Question 1
+Add your name and the date to the top of your script file (hint: comment this out so R does not try to run it)
+
+## Solution {.unnumbered}
+1. Add a `#` at the beginning of the row, followed by your name and the date, for example:
+
+```{r}
+#| label: ex2.1-sol
+#| eval: false
+
+# Sophie 18/11/2024
+```
+
+## Question 2
+Use R to answer to following sums:
+
+  a. $64^2$
+
+  b. $3432 \div 8$
+
+  c. $96 \times 72$
+ 
+For each part of question 2, copy the result from the console and paste them onto the same line of the script file as the code. Do this in a way that ensures there are no error messages if you were to run the entire script file.
+
+## Solution {.unnumbered}
+For each calculation, copy the result from the console and paste it in the script file after a `#` symbol:
+
+```{r}
+#| label: ex2.2-sol
+#| eval: false
+
+64^2   # 4092
+
+3432 / 8  # 429
+
+96 * 72  # 6912
+```
+
+
+

@@ -1,15 +1,63 @@
 # Welcome! {.unnumbered}
 
-Welcome to the Introduction to Quantitative Analysis with R course, designed for and with the Department for Levelling Up, Housing and Communities (DLUCH). This course aims to introduce R and RStudio software. R is an open-source software that was designed to make data analysis more accessible, reproducible, and user friendly. 
+Welcome to the Introduction to Quantitative Analysis with R course, designed for and with the Ministry of Housing, Communities and Local Government (MHCLG). This course aims to introduce R and RStudio software. R is an open-source software that was designed to make data analysis more accessible, reproducible, and user friendly. 
 
 This two-day course will equip you with the essential skills to leverage the power of R for your data analysis. We will begin with a gentle introduction to the RStudio interface and the basics of the R coding language (or syntax). We will then see how R can be used to efficiently load, clean and transform data. Finally, we will use R to produce clear, compelling visualisations and tables to communicate findings. 
 
 Throughout the course, we will discuss best practices for reproducible data analysis, ensuring that all code adheres to the [Analysis Standards](https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html) as recommended by the [Aqua book](https://www.gov.uk/government/publications/the-aqua-book-guidance-on-producing-quality-analysis-for-government).
 
-::: {.callout-tip}
-### Style tip
+## How to use these materials
+This e-book provides a combination of written explanations, code examples, and practical exercises to allow you to practice what you have learned. 
 
-Throughout the notes, you will see boxes with 'style tips'. These are to ensure that your code follows the [Tidyverse style guide](https://style.tidyverse.org/index.html), and ensuring your code adhered to [Analysis Standards](https://best-practice-and-impact.github.io/qa-of-code-guidance/intro.html).
+```{r}
+#| label: code-block-example
+#| eval: false
+
+1 + 1
+```
+
+Code within these blocks can be copied and pasted into your R session to save time when coding (I recommend typing the code yourself to familiarise yourself with the coding process and use the copy option if you are really stuck!). 
+
+Throughout the materials, you will see colour-coded boxes which are used to highlight important points, give warnings, or give tips such as keyboard shortcuts.
+
+:::{.callout-note}
+These boxes will be used to highlight important messages, supplementing the main text.
+:::
+
+:::{.callout-tip}
+## Hint
+
+These boxes will contain useful hints, such as keyboard shortcuts, that can make your coding life a little easier!
+:::
+
+:::{.stylebox}
+
+::::{.stylebox-header}
+:::::{.stylebox-icon}
+:::::
+Style tip
+::::
+
+::::{.stylebox-body}
+These boxes contain style tips to ensure that your code follows the [Tidyverse style guide](https://style.tidyverse.org/), making it as consistent and readable as possible.
+::::
+
+:::
+
+:::{.callout-warning}
+These boxes will contain warnings and highlight areas where you need to be more cautious in your coding or analysis.
+:::
+
+To make these notes as accessible as possible, they are available to view in dark mode by toggling the ![](img/dark_mode.png) button. They are also available to download as a PDF file using the ![](img/pdf.png) button.
+
+All exercise solutions are available in the appendices. Please attempt the exercises yourself first, making full use of R's built in help files, [cheatsheets](https://posit.co/resources/cheatsheets/) and example R code in this book. Going straight to the solutions to copy and paste the code without thinking will not help you after the course!
+
+Some exercises contain expandable hints, such as functions required to complete them, that can be viewed when needed. For example:
+
+:::{.callout-caution collapse="true"}
+## Exercise hint
+
+The functions you will need for this exercise are `filter` and `count`. 
 :::
 
 ## Data for the course

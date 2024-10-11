@@ -1,29 +1,44 @@
+---
+code-annotations: hover
+---
+
 # Exercise 8 solution
 
 ```{r setup, include = FALSE}
 pacman::p_load(tidyverse)
 
-obr_data <- read_csv("saved_data/obr_data.csv")
+obr_data <- read_csv("saved_data/obr_data.csv") 
 ```
 
 ## Question 
-Choose an appropriate visualisation to investigate the change in employment rate between 2008 and 2024. Generate this visualisation and comment on your findings.
+Disposable income is the sum of labour income, non-labour income, and net taxes and benefits. Decompose the time series created in Exercise 7 to show how the contribution of these elements to total disposable income varied across time.
 
 ### Solution {.unnumbered}
-A **line graph** would generally be the most appropriate visualisation to show a numeric variable over time. The visual marking on the graph would be a line, defined by time on the x-axis and employment rate on the y-axis. 
+A stacked area chart (generated using `geom_area`) would allow us to visualise the total disposable income, broken down into the different income streams. The stacked area chart is created by layering each income value on top of one another, using a categorical variable representing income type to determine the area `fill`. This layout will require us to `pivot` the data to convert it into a long format.
 
-To create this line graph, we must ensure that all information needed is included in the data. In this case, we will need to create a new `time` variable, beginning at 1, that combines year and quarter to make up the x-axis:
+```{r}
+#| label: stacked-area
 
-```{r create time variable}
-obr_data <- mutate(obr_data,
-                   time = (year - 2008) * 4 + quarter)
+obr_data %>% 
+  mutate(time = year + ((quarter - 1) * .25)) %>% #<1>
+  select(time, labour_income, nonlabour_inc, #<2>
+         net_tax_benefits) %>% #<2>
+  pivot_longer(cols = -time, #<3>
+               names_to = "income_type", #<4>
+               names_transform = list(income_type = as.factor), #<5>
+               values_to = "value") %>% #<6>
+  ggplot() +
+  geom_area(aes(x = time, y = value, fill = income_type))
+
 ```
 
-To build the line graph, we first use the `ggplot` function and specify the data that we wish to display on the coordinate system. We then use the `geom_line` function to visualise the data, specifying the variables thatdefine this visualisation:
+1. Create a `time` variable for the x-axis that accounts for both year and quarter
+2. Select variables required for the visualisation
+3. Pivot all variables apart from `time` 
+4. Use the current variable names to create a new variable named `income_type`
+5. Convert the new `income_type` variable to `factor` (by default, R treats variable names as `character`)
+6. Use the current income values to create a new variable named `values`
 
-```{r line graph employment rate}
-# Generate the chart area and specify the data
-ggplot(data = obr_data) +
-  # Add a line, defined by time on the x-axis, and employment rate on the y
-  geom_line(aes(x = time, y = employment_rate))
-```
+
+
+
