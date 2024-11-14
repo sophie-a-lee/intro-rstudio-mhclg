@@ -497,12 +497,14 @@ Warning
 <p>The proportion of observations in a given group is estimated as the number in the group divided by the total sample size. This gives a value between 0 and 1. Multiplying the proportion by 100 will give the percentage in each group, taking the value between 0 and 100%.</p>
 <p>For example, to calculate the proportion of respondents that live in privately rented properties, we divide the total number in that group by the total number of respondents:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="annotated-cell-8"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-8-1"><a href="#annotated-cell-8-1" aria-hidden="true" tabindex="-1"></a>ehs_tidy <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="annotated-cell-8"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-8-1"><a href="#annotated-cell-8-1" aria-hidden="true" tabindex="-1"></a>perc_tenure_type <span class="ot">&lt;-</span> ehs_tidy <span class="sc">%&gt;%</span> </span>
 <button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="1">1</button><span id="annotated-cell-8-2" class="code-annotation-target"><a href="#annotated-cell-8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tenure_type) <span class="sc">%&gt;%</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="2">2</button><span id="annotated-cell-8-3" class="code-annotation-target"><a href="#annotated-cell-8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_tenancy =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="2">2</button><span id="annotated-cell-8-3" class="code-annotation-target"><a href="#annotated-cell-8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_tenancy =</span> <span class="fu">sum</span>(weighting<span class="sc">/</span><span class="dv">1000</span>)) <span class="sc">%&gt;%</span></span>
 <button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="3">3</button><span id="annotated-cell-8-4" class="code-annotation-target"><a href="#annotated-cell-8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <button class="code-annotation-anchor" data-target-cell="annotated-cell-8" data-target-annotation="4">4</button><span id="annotated-cell-8-5" class="code-annotation-target"><a href="#annotated-cell-8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_responses =</span> <span class="fu">sum</span>(n_tenancy),</span>
-<span id="annotated-cell-8-6"><a href="#annotated-cell-8-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">prop_tenure =</span> n_tenancy <span class="sc">/</span> n_responses)</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="annotated-cell-8-6"><a href="#annotated-cell-8-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">prop_tenure =</span> n_tenancy <span class="sc">/</span> n_responses) </span>
+<span id="annotated-cell-8-7"><a href="#annotated-cell-8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-8-8"><a href="#annotated-cell-8-8" aria-hidden="true" tabindex="-1"></a>perc_tenure_type</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-8" data-target-annotation="1">1</dt>
@@ -511,48 +513,58 @@ Warning
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="3" data-code-annotation="2">Then count the number of rows in each of these group (types)</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="3" data-code-annotation="2">Then count the number of households in each tenure type. Note that as this data are weighted, the total number of households is given by the sum of the weighting variable. This is divided by 1000 to present the value in 1000s of households.</span>
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="4" data-code-annotation="3">Be sure to ungroup to remove this structure!</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="4" data-code-annotation="3">Be sure to ungroup to remove this grouping structure!</span>
 </dd>
 <dt data-target-cell="annotated-cell-8" data-target-annotation="4">4</dt>
 <dd>
-<span data-code-cell="annotated-cell-8" data-code-lines="5,6" data-code-annotation="4">Now calculate the total number of respondents overall and divide the group total by the overall total</span>
+<span data-code-cell="annotated-cell-8" data-code-lines="5" data-code-annotation="4">Now calculate the total number of respondents overall and divide the group total by the overall total</span>
 </dd>
 </dl>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 4
   tenure_type         n_tenancy n_responses prop_tenure
-  &lt;fct&gt;                   &lt;int&gt;       &lt;int&gt;       &lt;dbl&gt;
-1 housing association      1429        9752      0.147 
-2 local authority           971        9752      0.0996
-3 owner occupied           5617        9752      0.576 
-4 private rented           1735        9752      0.178 </code></pre>
+  &lt;fct&gt;                   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1 housing association     2456.      24200.      0.101 
+2 local authority         1572.      24200.      0.0650
+3 owner occupied         15562.      24200.      0.643 
+4 private rented          4611.      24200.      0.191 </code></pre>
 </div>
 </div>
-<p>From this summary table, the proportion of responders that lived in privately rented properties was 0.178. To convert this into a percentage, we multiple the proportions by 100%:</p>
+<p>From this summary table, the proportion of responders that lived in privately rented properties was 0.191. To convert this into a percentage, we multiple the proportions by 100%:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ehs_tidy <span class="sc">%&gt;%</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tenure_type) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_tenancy =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_responses =</span> <span class="fu">sum</span>(n_tenancy),</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">prop_tenure =</span> n_tenancy <span class="sc">/</span> n_responses,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">perc_tenure =</span> prop_tenure <span class="sc">*</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="annotated-cell-9"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-9-1"><a href="#annotated-cell-9-1" aria-hidden="true" tabindex="-1"></a>perc_tenure_type <span class="ot">&lt;-</span> perc_tenure_type <span class="sc">%&gt;%</span> </span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1">1</button><span id="annotated-cell-9-2" class="code-annotation-target"><a href="#annotated-cell-9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">perc_tenure =</span> <span class="fu">round</span>(prop_tenure <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">2</span>)) <span class="sc">%&gt;%</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="2">2</button><span id="annotated-cell-9-3" class="code-annotation-target"><a href="#annotated-cell-9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tenure_type, n_tenancy, perc_tenure)</span>
+<span id="annotated-cell-9-4"><a href="#annotated-cell-9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-9-5"><a href="#annotated-cell-9-5" aria-hidden="true" tabindex="-1"></a>perc_tenure_type</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-hidden code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="2" data-code-annotation="1">Round the percentage to 2 decimal places to make it easier to interpret.</span>
+</dd>
+<dt data-target-cell="annotated-cell-9" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-9" data-code-lines="3" data-code-annotation="2">Only keep the variables required for the table.</span>
+</dd>
+</dl>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 5
-  tenure_type         n_tenancy n_responses prop_tenure perc_tenure
-  &lt;fct&gt;                   &lt;int&gt;       &lt;int&gt;       &lt;dbl&gt;       &lt;dbl&gt;
-1 housing association      1429        9752      0.147        14.7 
-2 local authority           971        9752      0.0996        9.96
-3 owner occupied           5617        9752      0.576        57.6 
-4 private rented           1735        9752      0.178        17.8 </code></pre>
+<pre><code># A tibble: 4 × 3
+  tenure_type         n_tenancy perc_tenure
+  &lt;fct&gt;                   &lt;dbl&gt;       &lt;dbl&gt;
+1 housing association     2456.        10.2
+2 local authority         1572.         6.5
+3 owner occupied         15562.        64.3
+4 private rented          4611.        19.0</code></pre>
 </div>
 </div>
-<p>Therefore, 17.8% of responders lived in privately rented properties.</p>
+<p>Therefore, 19.05% of responders lived in privately rented properties.</p>
 </section>
 <section id="summarising-numeric-variables" class="level3" data-number="5.2.3">
 <h3 data-number="5.2.3" class="anchored" data-anchor-id="summarising-numeric-variables"><span class="header-section-number">5.2.3</span> Summarising numeric variables</h3>

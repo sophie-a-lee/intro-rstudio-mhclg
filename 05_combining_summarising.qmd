@@ -165,34 +165,37 @@ The proportion of observations in a given group is estimated as the number in th
 For example, to calculate the proportion of respondents that live in privately rented properties, we divide the total number in that group by the total number of respondents:
 
 ```{r proportion of private rent}
-ehs_tidy %>% 
+perc_tenure_type <- ehs_tidy %>% 
   group_by(tenure_type) %>% #<1>
-  summarise(n_tenancy = n()) %>% #<2> 
+  summarise(n_tenancy = sum(weighting/1000)) %>% #<2> 
   ungroup() %>%  #<3>
   mutate(n_responses = sum(n_tenancy), #<4>
-         prop_tenure = n_tenancy / n_responses) #<4>
+         prop_tenure = n_tenancy / n_responses) 
+
+perc_tenure_type
 ```
 
 
 1. First group the data by tenure type
-2. Then count the number of rows in each of these group (types)
-3. Be sure to ungroup to remove this structure!
+2. Then count the number of households in each tenure type. Note that as this data are weighted, the total number of households is given by the sum of the weighting variable. This is divided by 1000 to present the value in 1000s of households.
+3. Be sure to ungroup to remove this grouping structure!
 4. Now calculate the total number of respondents overall and divide the group total by the overall total
 
 
-From this summary table, the proportion of responders that lived in privately rented properties was 0.178. To convert this into a percentage, we multiple the proportions by 100%:
+From this summary table, the proportion of responders that lived in privately rented properties was `{r} round(perc_tenure_type[perc_tenure_type$tenure_type == "private rented", "prop_tenure"], 3)`. To convert this into a percentage, we multiple the proportions by 100%:
 
 ```{r percentage private rent}
-ehs_tidy %>% 
-  group_by(tenure_type) %>% 
-  summarise(n_tenancy = n()) %>% 
-  ungroup() %>% 
-  mutate(n_responses = sum(n_tenancy),
-         prop_tenure = n_tenancy / n_responses,
-         perc_tenure = prop_tenure * 100)
+perc_tenure_type <- perc_tenure_type %>% 
+  mutate(perc_tenure = round(prop_tenure * 100, 2)) %>% #<1>
+  select(tenure_type, n_tenancy, perc_tenure) #<2>
+
+perc_tenure_type
 ```
 
-Therefore, 17.8% of responders lived in privately rented properties. 
+1. Round the percentage to 2 decimal places to make it easier to interpret.
+2. Only keep the variables required for the table.
+
+Therefore, `{r} perc_tenure_type[perc_tenure_type$tenure_type == "private rented", "perc_tenure"]`% of responders lived in privately rented properties. 
 
 ### Summarising numeric variables
 Numeric variables are typically summarised using the centre of the variable, also known as the average, and a measure of the spread of the variable. The most appropriate choice of summary statistics will depend on the distribution of the variable. More specifically, whether the numeric variable is normally distributed or not. The shape/distribution of a variable is typically investigated by plotting data in a histogram.

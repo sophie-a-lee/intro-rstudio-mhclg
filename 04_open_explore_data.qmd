@@ -296,6 +296,10 @@ ehs_general_reduced <- mutate(ehs_general_reduced,
                                                   labels = c("Low", "Medium",
                                                               "High")))
 ```
+
+:::{.callout-warning}
+The example converting our weighting variable into a categorical alternative is **purely for deomstrative purposes**. In reality, we would not treat a weighting variable this way. 
+:::
   
 :::{.callout-tip}
 ## Hint
