@@ -31,7 +31,9 @@ For example:
 :::{.callout-tip}
 ### Hint
 
-To comment out chunks of code, highlight the rows and use the keyboard shortcut `ctrl + shift + c` on Windows, and `Command + shift + c` on Mac
+To comment out chunks of code, highlight the rows and use the keyboard shortcut `ctrl + shift + c` on Windows, and `Command + shift + c` on Mac.
+
+To create a section heading, use the keyboard shortcut `ctrl + shift + r` (`Command + shift + r`) and enter your section header into the window.
 :::
 
 The choice of brackets in R coding is particularly important as they all have different functions:

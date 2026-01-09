@@ -7,7 +7,7 @@ code-annotations: hover
 ```{r setup, include = FALSE}
 pacman::p_load(tidyverse, flextable)
 
-ehs_tidy <- read_csv("saved_data/ehs_tidy.csv") %>% 
+ehs_tidy <- read_csv("saved_data/ehs_tidy.csv") |> 
   mutate(tenure_type = factor(tenure_type),
          length_residence = factor(length_residence,
                                    levels = c("less than 1 year", "one year",
@@ -46,7 +46,7 @@ tibble(n_vars = c("One variable", rep("", 4), "Two variables", rep("", 4),
                          "Scatterplot with different colours/symbols/sizes"),
        geom_obj = c("table", "geom_bar", "geom_histogram", "geom_sf",
                     "geom_line", "table", "geom_bar", "geom_point",
-                    "geom_boxplot", "geom_point", "table", "geom_point")) %>% 
+                    "geom_boxplot", "geom_point", "table", "geom_point")) |> 
   knitr::kable(col.names = c("Number of variables", "Type of variables",
                              "Name of visualisation", "R function"))
 
@@ -93,7 +93,7 @@ ggplot(data = ehs_tidy,
 ```
 
 :::{.callout-warning}
-Although `ggplot2` is part of the tidverse package, it uses a `+` symbol to add layers to visualisations rather than the pipe `%>%` we have been using in other packages. 
+Although `ggplot2` is part of the tidverse package, it uses a `+` symbol to add layers to visualisations rather than the pipe `|>` we have been using in other packages. 
 :::
 
 The plot may not be pretty, but it contains all three elements required by graphics. Additional layers will be introduced throughout this chapter to improve the design of this visualisation.
@@ -441,7 +441,7 @@ There are 8 complete themes programmed in the `ggplot2` package. These are:
 x <-  runif(10)
 y <- 2 + (10 * x) + rnorm(10, 0, 10)
 
-base_plot <- tibble(x, y) %>% 
+base_plot <- tibble(x, y) |> 
   ggplot(aes(x = x, y = y)) +
   geom_point()
 
@@ -609,8 +609,8 @@ Remember that the value 100,000 actually represents anyone earning £100,000 or 
 :::
 
 ```{r boxplot income tenure region cleaner}
-ehs_tidy %>% 
-  filter(gross_income != 100000) %>% #<1>
+ehs_tidy |> 
+  filter(gross_income != 100000) |> #<1>
   ggplot() + #<2>
   geom_boxplot(aes(x = tenure_type, y = gross_income)) +
   scale_x_discrete(labels = scales::label_wrap(8)) + #<3>

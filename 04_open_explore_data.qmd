@@ -1,8 +1,7 @@
 ---
+title: "Opening and exploring data"
 code-annotations: hover
 ---
-
-# Opening and exploring data
 
 ## Styles of R coding
 Up to this point, beyond the style tips sprinkled through these notes, we have not thought about the style of R coding we will be using. There are different approaches to R coding that we can use, they can be thought of as different dialects of the R programming language. 
@@ -17,7 +16,7 @@ The choice of R 'dialect' depends on personal preference. Some prefer to use the
 #| 
 
 library(tidyverse)
-memer::meme_get("DistractedBf") %>% 
+memer::meme_get("DistractedBf") |> 
   memer::meme_text_distbf("tidyverse", "new R users", "base R")
 ```
 
@@ -237,11 +236,13 @@ filter(ehs_general_reduced, tenure4x == 2, gorehs == 1)
 ## Pipes
 When creating an analysis-ready dataset, we often want to combine functions such as `select` and `filter`. Previously, these would need to be carried out separately and a new object would need to be created or overwritten at each step, clogging up the environment. 
 
-In `tidyverse`, we combine functions within a single process using the **pipe** symbol `%>%`, which is read as **and then** within the code. For example, if we wanted to just select the unique identifiers of respondents that were privately renting in the North East, we could do this in a single process:
+One of the major impacts on R programming as a result of the `tidyverse` approach is the use of **pipes**. A pipe symbol, either `magrittr`'s `%>%` or base R's `|>` can be read "and then". Pipes are able to combine multiple lines of coode into a single process. This makes code easier to read, reduces the number of objects required, and avoids duplicating objects.
+
+For example, if we wanted to select the unique identifiers of respondents that were privately renting in the North East, we could do this in a single process:
 
 ```{r piped ID for private rent in NE}
-ehs_general_reduced %>% 
-  filter(tenure4x == 2, gorehs == 1) %>% 
+ehs_general_reduced |> 
+  filter(tenure4x == 2, gorehs == 1) |> 
   select(serialanon)
 ```
 
@@ -254,7 +255,11 @@ Style tip
 ::::
 
 ::::{.stylebox-body}
-When combining multiple functions within a process using pipes, it is good practice to start the code with the data and pipe that into the functions, rather than including it in the function itself.
+Both the `|>` and `%>%` pipe work in similar ways. However, `|>` does not require additional packages and therefore reduces risk of errors in code. For the sake of consistency, it is recommended to use just the `|>` pipe in your code.
+
+For information about the differences between these pipes, visit [this blog post](https://tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/). 
+
+Pipes should be added at the end of a line, followed by a line break. The next line should be indented to indicate that it is part of the same process. To control indentation, visit `Global Options`.
 ::::
 
 :::
@@ -262,7 +267,9 @@ When combining multiple functions within a process using pipes, it is good pract
 :::{.callout-tip}
 ### Hint
 
-Rather than typing out pipes every time, use the keyboard shortcut *ctrl + shift + m* for Windows and *Command + shift + m* for Mac.
+Pipes can be added using the keyboard shortcut *ctrl + shift + m* for Windows and *Command + shift + m* for Mac.
+
+To control which pipe is added by this shortcut, visit the `Code` tab of the `Global Options` window.
 :::
 
 ## Creating new variables
@@ -324,16 +331,16 @@ Or look at the `dplyr` [web page and cheatsheet](https://dplyr.tidyverse.org/ind
 
 
 ## A smooth process to the analysis dataset
-Our EHS analysis dataset has been created haphazardly through this chapter to demonstrate each step separately. In reality, we would load this data and manipulate it in one process, separating steps by pipes `%>%`. 
+Our EHS analysis dataset has been created haphazardly through this chapter to demonstrate each step separately. In reality, we would load this data and manipulate it in one process, separating steps by pipes `|>`. 
 
 The code below takes the data from its saw form (the .sav file) and transforms it into a clean dataset that we will be using for the rest of the course:
 
 ```{r ehs_general tidy, results = "hide"}
-ehs_general_tidy <- read_spss(file = "Data/generalfs21_EUL.sav") %>% #<1>
+ehs_general_tidy <- read_spss(file = "Data/generalfs21_EUL.sav") |> #<1>
                     mutate(tenure_type = as_factor(tenure4x), #<2>
-                           region = as_factor(gorehs)) %>% #<2>
+                           region = as_factor(gorehs)) |> #<2>
                     rename(id = serialanon, #<3>
-                           weighting = aagfh21) %>% #<3>
+                           weighting = aagfh21) |> #<3>
                     select(id, weighting, tenure_type, region) #<4>
 
 str(ehs_general_tidy) #<5>

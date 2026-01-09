@@ -23,11 +23,15 @@ As with any file format, we must ensure data are in the correct form before load
 
 Excel files can be a little trickier to manipulate than SPSS and CSV files as they often contain multiple sheets. This is the case for the data that we will be using for this part of the course.
 
-The Excel file that we will be loading contains the [Office for Budget Responsibility (OBR) economic and fiscal outlook](https://view.officeapps.live.com/op/view.aspx?src=https%3A%2F%2Fobr.uk%2Fdocs%2Fdlm_uploads%2FDetailed_forecast_tables_Economy_March_2024.xlsx&wdOrigin=BROWSELINK). This contains many sheets of data, but for this course we will just be focusing on three:
+The Excel file that we will be loading contains the Office for Budget Responsibility (OBR) economic and fiscal outlook from 2024. This contains many sheets of data, but for this course we will just be focusing on three:
 
 - 1.13 Household disposable income
 - 1.14 National living wage
 - 1.17 Housing market
+
+:::{.callout-note}
+Data can be accessed via the [course repository](https://github.com/sophie-a-lee/introduction_rstudio_dluch/tree/main/data).
+:::
 
 Let's begin with housing market data, stored in the 18th sheet, labelled "1.17". This sheet can be selected in the `read_xlsx` function using the `sheet` argument. 
 
@@ -63,7 +67,7 @@ list.files(path = "data") #<1>
 housing_market <- 
   read_xlsx("data/Detailed_forecast_tables_Economy_March_2024.xlsx",
                             sheet = "1.17",range = "B4:J88",  #<2>
-                            col_names = FALSE) %>%  #<3> 
+                            col_names = FALSE) |>  #<3> 
   setNames(c("period", "hpi_comp15", "hpi_prev_year", #<4>
              "residential_property_transactions", 
              "private_enterprise_housing_starts",
@@ -88,7 +92,7 @@ Do not run this code without installing and loading the `janitor` package first.
 housing_market_alt <-
   read_xlsx("data/Detailed_forecast_tables_Economy_March_2024.xlsx",
                                 # Specify the sheet and range of cells to keep
-                                sheet = "1.17",range = "B3:J88") %>% 
+                                sheet = "1.17",range = "B3:J88") |> 
   clean_names()
 ```
 
@@ -98,10 +102,10 @@ In the current dataset, the time variable is given as a character and so is not 
 The `str_sub` function from tidyverse's `stringr` package extracts elements based on their position in a string of characters. This can be used to return the first 4 digits to a new `year` variable, and the final digit to a new `quarter` variable:
 
 ```{r split date variable}
-housing_market <- housing_market %>%
+housing_market <- housing_market |>
   mutate(year =  as.numeric(str_sub(period, start = 1, end = 4)), #<1>
          quarter = as.numeric(str_sub(period, 
-                              start = -1L, end = -1L))) %>%  #<2>
+                              start = -1L, end = -1L))) |>  #<2>
   select(-period) #<3>
 ```
 
@@ -138,18 +142,18 @@ Although the `rename` function requires each individual variable to be listed, l
 disposable_income <-
   read_xlsx("data/Detailed_forecast_tables_Economy_March_2024.xlsx",
                                sheet = "1.13",range = "B4:I51", 
-                               col_names = FALSE) %>% 
+                               col_names = FALSE) |> 
   setNames(c("period", "labour_income", "emp_comp", "mixed_income",
              "emp_social_cont", "nonlabour_inc", "net_tax_benefits",
-             "disposable_income")) %>% 
+             "disposable_income")) |> 
   mutate(year = as.numeric(str_sub(period, start = 1L, end = 4L)),
-         quarter = as.numeric(str_sub(period, start = -1L, end = -1L))) %>% 
+         quarter = as.numeric(str_sub(period, start = -1L, end = -1L))) |> 
   select(-period)
 
 living_wage <- 
   read_xlsx("data/Detailed_forecast_tables_Economy_March_2024.xlsx",
             # Specify the sheet and range of cells to keep
-            sheet = "1.14", range = c("C4:K5")) %>% 
+            sheet = "1.14", range = c("C4:K5")) |> 
   # Rename variables by pasting the prefix "year_" to the original name
   rename_with(~paste0("year_", .x))
 ```
@@ -171,7 +175,7 @@ There are many ways to pivot data within R (see the helpfile `?pivot_longer` for
 For our data, we will need to convert the wide-format living wage data to a long-format so we are able to join it to the other data. This will create a new dataset with 2 variables: `year` and `living_wage`, with a row per year. The `year` variable will be taken from the wide data names, and the `living_wage` variable will come from the wide data values:
 
 ```{r pivot living wage}
-living_wage_long <- living_wage %>% 
+living_wage_long <- living_wage |> 
   pivot_longer(cols = everything(), #<1>
                names_to = "year", #<2>
                names_prefix = "year_", #<3>
@@ -199,9 +203,9 @@ write_csv(living_wage_long, file = "saved_data/living_wage_long.csv")
 #| include: false
 
 obr_data <- full_join(housing_market, disposable_income, 
-                      by = c("year", "quarter")) %>% 
+                      by = c("year", "quarter")) |> 
   # join this data to the living wage
-  full_join(., living_wage_long, by = "year", multiple = "all")
+  full_join(living_wage_long, by = "year", multiple = "all")
 
 write_csv(obr_data, file = "saved_data/obr_data.csv")
 ```
