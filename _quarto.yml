@@ -12,7 +12,6 @@ book:
   repo-url: https://github.com/sophie-a-lee/introduction_rstudio_dluch
   repo-actions: [edit]
   downloads: [pdf]
-  sharing: [twitter]
   chapters:
     - index.qmd
     - part: "Introduction to R and RStudio"

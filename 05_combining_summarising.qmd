@@ -7,16 +7,16 @@ code-annotations: hover
 ```{r setup and load data, echo = FALSE}
 pacman::p_load(tidyverse, haven)
 
-read_spss("data/interviewfs21_EUL.sav") %>% 
-  select(serialanon, HYEARGRx, lenresb, rentwkx, mortwkx, freeLeas) %>% 
+read_spss("data/interviewfs21_EUL.sav") |> 
+  select(serialanon, HYEARGRx, lenresb, rentwkx, mortwkx, freeLeas) |> 
   mutate(length_residence = as_factor(lenresb),
-         freehold_leasehold = as_factor(freeLeas)) %>% 
+         freehold_leasehold = as_factor(freeLeas)) |> 
   rename(id = serialanon,
          gross_income = HYEARGRx,
          weekly_rent = rentwkx,
-         weekly_mortgage = mortwkx) %>% 
+         weekly_mortgage = mortwkx) |> 
   select(id, gross_income, length_residence, weekly_rent, weekly_mortgage, 
-         freehold_leasehold) %>% 
+         freehold_leasehold) |> 
   write_csv(file = "saved_data/ehs_interview_tidy.csv")
 ```
 
@@ -35,11 +35,11 @@ Notice that by default, the variables that were classed as factors have been rec
 When we need to apply the same function to a group of variables within a dataset, the `mutate` function can be combined with `across`, which uses selection helpers (see `?dplyr_tidy_select`) and retains the original variable names:
 
 ```{r load ehs data and reclassify, message = FALSE}
-ehs_general_tidy <- read_csv("saved_data/ehs_general_tidy.csv") %>% 
+ehs_general_tidy <- read_csv("saved_data/ehs_general_tidy.csv") |> 
   mutate(across(where(is.character), factor))
 
 
-ehs_interview_tidy <- read_csv("saved_data/ehs_interview_tidy.csv") %>% 
+ehs_interview_tidy <- read_csv("saved_data/ehs_interview_tidy.csv") |> 
   mutate(across(where(is.character), factor))
 ```
 
@@ -110,11 +110,11 @@ Whenever using `group_by`, make sure to `ungroup` the data before proceeding. Th
 For example, we can expand the gross income summary table to show these summaries separated by region:
 
 ```{r summary gross income by region}
-ehs_tidy %>% 
-  group_by(region) %>% 
+ehs_tidy |> 
+  group_by(region) |> 
   summarise(total_income = sum(gross_income),
             median_income = median(gross_income),
-            n_rows = n()) %>% 
+            n_rows = n()) |> 
   ungroup()
 ```
 
@@ -145,8 +145,8 @@ The weighted total income is calculated by summing the product of each household
 ```{r weighted summary total}
 library(Hmisc)
 
-ehs_tidy %>% 
-  mutate(wtd_income = gross_income * weighting) %>% 
+ehs_tidy |> 
+  mutate(wtd_income = gross_income * weighting) |> 
   summarise(mean_income_unwtd = mean(gross_income),
             mean_income_wtd = wtd.mean(gross_income, weights = weighting),
             median_income_unwtd = median(gross_income),
@@ -165,10 +165,10 @@ The proportion of observations in a given group is estimated as the number in th
 For example, to calculate the proportion of respondents that live in privately rented properties, we divide the total number in that group by the total number of respondents:
 
 ```{r proportion of private rent}
-perc_tenure_type <- ehs_tidy %>% 
-  group_by(tenure_type) %>% #<1>
-  summarise(n_tenancy = sum(weighting/1000)) %>% #<2> 
-  ungroup() %>%  #<3>
+perc_tenure_type <- ehs_tidy |> 
+  group_by(tenure_type) |> #<1>
+  summarise(n_tenancy = sum(weighting/1000)) |> #<2> 
+  ungroup() |>  #<3>
   mutate(n_responses = sum(n_tenancy), #<4>
          prop_tenure = n_tenancy / n_responses) 
 
@@ -185,8 +185,8 @@ perc_tenure_type
 From this summary table, the proportion of responders that lived in privately rented properties was `{r} round(perc_tenure_type[perc_tenure_type$tenure_type == "private rented", "prop_tenure"], 3)`. To convert this into a percentage, we multiple the proportions by 100%:
 
 ```{r percentage private rent}
-perc_tenure_type <- perc_tenure_type %>% 
-  mutate(perc_tenure = round(prop_tenure * 100, 2)) %>% #<1>
+perc_tenure_type <- perc_tenure_type |> 
+  mutate(perc_tenure = round(prop_tenure * 100, 2)) |> #<1>
   select(tenure_type, n_tenancy, perc_tenure) #<2>
 
 perc_tenure_type

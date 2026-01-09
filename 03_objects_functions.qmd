@@ -55,8 +55,53 @@ R has some mathematical objects stored by default such as pi that can be used in
 pi
 ```
 
+## Atomaic vectors
+One of the most common object types in R (and the basis of many other, more complex objects) is an **atomic vector**. These objects store values as a one-dimensional object of a single type. 
+
+`object_1` is a very simple atomic vector with just a single element. More complex vectors can be created using the `c` function:
+
+```{r}
+#| label: vector-example
+ 
+object_2 <- c(object_1, 39, 8, 45)
+
+object_2
+```
+
+:::{callout-note}
+Vectors will only store elements of the same **type**. Within R, there most common value types are as follows:
+
+- `double`: numbers with decimal places (also known as `numeric`)
+- `integer`: whole numbers. To differentiate between `double` and `integer`, add `L` after a number to make it an integer (e.g. `5L`)
+- `character`: a string of values surrounded by quotes `""` (can contain numbers, letters, symbols, spaces, or any combination of these)
+- `logical`: takes the value `TRUE` or `FALSE`
+
+To check whether a vector is a certain type, use the `is.*` functions. For example:
+
+```{r}
+#| label: is-type
+
+is.integer(c(1, 2, 3, 4, 5))
+
+is.integer(c(1L, 2L, 3L, 4L, 5L))
+
+is.logical(is.integer(c(1L, 2L, 3L, 4L, 5L)))
+```
+:::
+
+R is a **vectorised** language to many operations carried out on vectors are applied to every element by default:
+
+```{r}
+#| label: vectorise
+
+object_2 * 2
+```
+
+
 ## Functions
-**Functions** are built-in commands that allow R users to run analyses. All functions require the definition of arguments within round brackets `()`. Each function requires different information and has different arguments that can be used to customise the analysis. A detailed list of these arguments and a description of the function can be found in the function's associated **help file**.
+**Functions** are built-in commands that allow R users to run analyses, produce outputs, or even organise the R environment. 
+
+All functions require the definition of arguments within round brackets `()`. Each function requires different information and has different arguments that can be used to customise the analysis. A detailed list of these arguments and a description of the function can be found in the function's associated **help file**.
 
 ### Help files
 Each function that exists within R has an associated help file. RStudio does not require an internet connection to access these help files if the function is available in the current session of R.
@@ -77,6 +122,35 @@ Help files contain the following information:
 ## Hint
 
 If you know the arguments required in a function are different to default settings, but are not totally sure the settings you require, consider running example code from the helpfile in the console and seeing how these arguments change the process.
+:::
+
+### Creating functions
+R users do not need to rely on pre-built functions, we can build our own. Functions are created using the `function` command, followed by brackets with arguments required to carry out the functions. This is followed by braces `{}` which contains the process we wish to perform.
+
+For example, we can create a simple function that will take a numeric input and double it, then round it to 1 decimal place:
+
+```{r}
+#| label: function-example
+
+double_number <- function(number) {
+  round(number * 2, digits = 1)
+}
+
+double_number(pi)
+```
+
+:::{.stylebox}
+
+::::{.stylebox-header}
+:::::{.stylebox-icon}
+:::::
+Style tip
+::::
+
+::::{.stylebox-body}
+As with object names, function names should be informative, concise, and contain only lower case letters, numbers and underscores `_`.
+::::
+
 :::
 
 ### Error and warning messages
